@@ -3,7 +3,7 @@
 *.csv
 
 # Dataset directory
-ds4504/
+ds004504/
 
 # Vim swap files
 *.swp
