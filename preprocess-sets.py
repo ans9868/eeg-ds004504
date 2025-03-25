@@ -25,7 +25,7 @@ def subPath(sub, derivatives=True):
 
     return path
 
-#TODO: allow to choose between generator and multithread , clean up comments
+#TODO: Make it so that feature creation is multiprocessed
 '''
 ProcessSub gets the power density from a subject. It has 3 modes. Generator, sequential or parallel.
 Ironically the parallel mode seems to be the slowest by about 15% and the other two are about tied.
@@ -33,7 +33,7 @@ Ironically the parallel mode seems to be the slowest by about 15% and the other 
 def _psd_generator(epochs, compute_psd):
     for i in range(len(epochs)):
         yield compute_psd(epochs[i])
-def processSub(sub, derivatives=True, method='welch', windowLength=3, stepSize=1.5, mode='generator', n_jobs=1):
+def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSize=1.5, mode='generator', n_jobs=1):
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']
 
@@ -71,6 +71,24 @@ def processSub(sub, derivatives=True, method='welch', windowLength=3, stepSize=1
     # return psds
 
     # computePsd = epoch.compute_psd(fmin=freqLow, fmax=freqHigh, method=method)
+'''
+This is for processing the subject without getting the psd's. It gets all the epochs for the subject.
+'''
+def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
+    raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
+    sfreq = raw.info['sfreq']
+
+    start_times = np.arange(0, raw.times[-1] - windowLength, stepSize)
+    events = np.array([[int(t * sfreq), 0, 1] for t in start_times]) # [sample_index, previous_event_1d, current_event_id], note, 0 -> means we don't have transitions between events,
+    
+    epochs = mne.Epochs(
+        raw, events, event_id=1, tmin=0, tmax=windowLength,
+        baseline=None, detrend=1, preload=True, verbose=False
+    )
+    
+    return epochs
+
+
 
 if __name__ == '__main__':
 
@@ -83,22 +101,25 @@ if __name__ == '__main__':
     A_sub = participantsInfo[participantsInfo["Group"] == "A"]["participant_id"].tolist()
     C_sub = participantsInfo[participantsInfo["Group"] == "C"]["participant_id"].tolist()
     D_sub = participantsInfo[participantsInfo["Group"] == "F"]["participant_id"].tolist()
-
+    
+    start = time.time()
+    processSub(A_sub[0])
+    print("processSub:", time.time()-start)
        
     start = time.time()
     # Generator mode
-    for psd in processSub(A_sub[0], mode='generator'):
+    for psd in processSubPSDs(A_sub[0], mode='generator'):
         pass
     print("Generator mode: ", time.time()-start)
 
     start = time.time()
     # Sequential
-    psds = processSub(A_sub[0], mode='sequential')
+    psds = processSubPSDs(A_sub[0], mode='sequential')
     print("Sequential mode: ", time.time()-start)
 
     start = time.time()
     # Parallel
-    psds_parallel = processSub(A_sub[0], mode='parallel', n_jobs=-1)
+    psds_parallel = processSubPSDs(A_sub[0], mode='parallel', n_jobs=-1)
     print("Parallel mode: ", time.time()-start)
 
 
