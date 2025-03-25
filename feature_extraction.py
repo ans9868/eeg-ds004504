@@ -5,6 +5,7 @@ import mne
 import os
 import time
 from joblib import Parallel, delayed 
-from preprocess-sets.py import processSub
+
+import preprocess_sets.py
 
 
