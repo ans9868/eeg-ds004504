@@ -15,6 +15,7 @@ freqBands = {
 }
 
 def subPath(sub, derivatives=True):
+    print("subPath", sub)
     if(derivatives):
        path = f"ds004504/derivatives/{sub}/eeg/{sub}_task-eyesclosed_eeg.set"
     else:
@@ -33,6 +34,7 @@ Ironically the parallel mode seems to be the slowest by about 15% and the other 
 def _psd_generator(epochs, compute_psd):
     for i in range(len(epochs)):
         yield compute_psd(epochs[i])
+
 def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSize=1.5, mode='generator', n_jobs=1):
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']
@@ -75,6 +77,7 @@ def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSi
 This is for processing the subject without getting the psd's. It gets all the epochs for the subject.
 '''
 def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
+    print("processSub", sub)
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']
 
