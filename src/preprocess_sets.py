@@ -22,11 +22,14 @@ def subPath(sub, derivatives=True):
        path = f"../ds004504/{sub}/eeg/{sub}_task-eyesclosed_eeg.set"
     
     if not os.path.exists(path):
-        raise FileNotFoundError(f'The path was not found for {sub}')
+        raise FileNotFoundError(f'The path was not found for {sub}, path: {path}')
 
     return path
 
-#TODO: Make it so that feature creation is multiprocessed
+def participantsInfoPath():
+    return '../ds004504/participants.tsv'
+
+
 '''
 ProcessSub gets the power density from a subject. It has 3 modes. Generator, sequential or parallel.
 Ironically the parallel mode seems to be the slowest by about 15% and the other two are about tied.
@@ -68,11 +71,6 @@ def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSi
         raise ValueError(f"Invalid mode '{mode}'. Choose from 'generator', 'sequential', or 'parallel'.")
 
 
-        # psds.append(epochPsd)
-    
-    # return psds
-
-    # computePsd = epoch.compute_psd(fmin=freqLow, fmax=freqHigh, method=method)
 '''
 This is for processing the subject without getting the psd's. It gets all the epochs for the subject.
 '''
@@ -96,7 +94,7 @@ def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
 if __name__ == '__main__':
 
 
-    participantsInfo = pd.read_table('./ds004504/participants.tsv')
+    participantsInfo = pd.read_table(participantsInfoPath())
 
 
     #Getting all the participaants 
