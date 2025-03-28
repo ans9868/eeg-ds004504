@@ -6,7 +6,8 @@ import os
 import time
 from joblib import Parallel, delayed 
 
-#*******
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+
 freqBands = {
     "Delta": (0.5, 4),
     "Theta": (4, 8),
@@ -16,10 +17,14 @@ freqBands = {
 
 def subPath(sub, derivatives=True):
     print("subPath", sub)
-    if(derivatives):
-       path = f"../ds004504/derivatives/{sub}/eeg/{sub}_task-eyesclosed_eeg.set"
+    
+    # Strip 'sub-' prefix if it exists
+    sub_id = sub.replace('sub-', '') if isinstance(sub, str) and sub.startswith('sub-') else sub
+    
+    if derivatives:
+       path = os.path.join(ROOT_DIR, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     else:
-       path = f"../ds004504/{sub}/eeg/{sub}_task-eyesclosed_eeg.set"
+       path = os.path.join(ROOT_DIR, 'ds004504', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     
     if not os.path.exists(path):
         raise FileNotFoundError(f'The path was not found for {sub}, path: {path}')
@@ -27,8 +32,7 @@ def subPath(sub, derivatives=True):
     return path
 
 def participantsInfoPath():
-    return '../ds004504/participants.tsv'
-
+    return os.path.join(ROOT_DIR, 'ds004504', 'participants.tsv')
 
 '''
 ProcessSub gets the power density from a subject. It has 3 modes. Generator, sequential or parallel.
@@ -93,7 +97,6 @@ def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
 
 if __name__ == '__main__':
 
-
     participantsInfo = pd.read_table(participantsInfoPath())
 
 
@@ -104,7 +107,16 @@ if __name__ == '__main__':
     D_sub = participantsInfo[participantsInfo["Group"] == "F"]["participant_id"].tolist()
     
     start = time.time()
-    processSub(A_sub[0])
+    epochs = processSub(A_sub[0])
+    epoch = epochs[0]
+   
+    print("printing epoch info")
+    # print(epochs.to_data_frame().shape())
+    print(epoch.info['ch_names'])
+    print(type(epochs))
+    print(type(epoch))
+
+   
     print("processSub:", time.time()-start)
        
     start = time.time()

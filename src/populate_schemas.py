@@ -12,6 +12,22 @@ from pyspark.sql import DataFrame
 
 
 # to test
+@pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
+def extract_features_udtf(pdf):
+    rows = []
+    for _, row in pdf.iterrows():
+        subject_id = row["SubjectID"]
+        try:
+            epochs = processSub(subject_id, derivatives=False)
+            for i, epoch in enumerate(epochs):
+                epoch_id = f"{subject_id}_ep{i}"
+                features = processEpoch(epoch)
+                for (electrode, band), stats in features:
+                    # Assuming `stats` is a tuple with (mean, variance, skewness, kurtosis)
+                    rows.append((subject_id, epoch_id, band, electrode, *stats))
+        except Exception as e:
+            print(f"Error processing {subject_id}: {e}")
+    return pd.DataFrame(rows, columns=[f.name for f in get_feature_schema()])
 
 # Tested
 def load_subjects_df(spark: SparkSession, participants_path: str) -> DataFrame:
