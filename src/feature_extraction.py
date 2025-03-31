@@ -35,8 +35,9 @@ def allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5,
         bandPower = np.squeeze(bandPower)
 
         for channel_idx, channel_name in enumerate(channelNames):
-            bandPowers.append(((channel_name, band_name), bandPower[channel_idx]))
-
+            bandPowers.append(((channel_name, band_name), (bandPower[channel_idx]))) 
+            # TODO: i put bandpower into a tupble  but this is a shortcut for now. We need to put all features into a tuple, not sure the best way to do that but it probably involves doing the PSD calculation in the main function
+            # *note* if do hte calculation in the main funciotn should try the 2 different methods
     # this should be a dataframe with numpy array funciotns
     # Channel {} band {} window power  [...]
     return bandPowers  # Returns list of tuples: (channel, band) → PSD value
@@ -50,7 +51,7 @@ def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, ste
 
     # need to combine all the dataframes from each data point here 
     
-    dataCombined = epochBandPower
+    dataCombined = [epochBandPower]
 
     return dataCombined
 

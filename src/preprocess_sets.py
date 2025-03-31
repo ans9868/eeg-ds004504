@@ -6,7 +6,21 @@ import os
 import time
 from joblib import Parallel, delayed 
 
-ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# print(os.getcwd())
+# from __init__.py import ROOT_DIR  # Import the path from __init__.py
+
+# only get ROOT_DIR from __init__.py if I am run as a module 
+
+# try:
+#     # Try to import from the package first
+#     from . import ROOT_DIR
+# except ImportError:
+#     # If that fails, set it directly
+#     ROOT_DIR = os.environ.get('EEG_DATA_ROOT', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+
+ROOT_DIR = '/Users/user/eeg-ds004504/'
 
 freqBands = {
     "Delta": (0.5, 4),
@@ -17,6 +31,7 @@ freqBands = {
 
 def subPath(sub, derivatives=True):
     print("subPath", sub)
+    # print("ROOT_DIR from __init__", ROOT_DIR)
     
     # Strip 'sub-' prefix if it exists
     sub_id = sub.replace('sub-', '') if isinstance(sub, str) and sub.startswith('sub-') else sub
@@ -28,7 +43,7 @@ def subPath(sub, derivatives=True):
     
     if not os.path.exists(path):
         raise FileNotFoundError(f'The path was not found for {sub}, path: {path}')
-
+    print(f"Path handed: {path}")
     return path
 
 def participantsInfoPath():
