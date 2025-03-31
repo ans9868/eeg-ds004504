@@ -14,11 +14,11 @@ def get_feature_schema():
         StructField("EpochID", StringType(), False),
         StructField("WaveBand", StringType(), False),
         StructField("Electrode", StringType(), False),
-        StructField("Power", FloatType(), True),
-        StructField("Skewness", FloatType(), True),
-        StructField("Kurtosis", FloatType(), True),
-        StructField("Variance", FloatType(), True),
-        StructField("Min", FloatType(), True),
-        StructField("Max", FloatType(), True),
-        StructField("Mean", FloatType(), True)
+        StructField("Power", FloatType(), True) # ... is the rounding a big deal ? 
+        #     StructField("Skewness", FloatType(), True),
+    #     StructField("Kurtosis", FloatType(), True),
+    #     StructField("Variance", FloatType(), True),
+    #     StructField("Min", FloatType(), True),
+    #     StructField("Max", FloatType(), True),
+    #     StructField("Mean", FloatType(), True)
     ])

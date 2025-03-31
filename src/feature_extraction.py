@@ -14,7 +14,7 @@ freqBands = {
     "Beta": (12, 30),
 }
 
-
+'''
 #Make a dicitonary of functions or ... how should we do each funciotn for feature extraction 
 def allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=-1):
     fmin=freqBands['Delta'][0] 
@@ -51,9 +51,105 @@ def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, ste
 
     # need to combine all the dataframes from each data point here 
     
-    dataCombined = [epochBandPower]
+    dataCombined = epochBandPower
 
     return dataCombined
+
+
+#BOUNDARY
+'''
+
+def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
+   # Select the channel's PSD and the frequencies in the range
+    band_mask = (freqs >= fmin) & (freqs < fmax)
+    # print(f'Normal psd shape {normalPsd.shape()}')
+    #print(f'Normal psd {normalPsd}')
+    band_power = normalPsd[channel_idx, band_mask].mean()
+    
+    return band_power
+
+
+def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mean across all frequencies to be consistent
+    total_power = normalPsd[channel_idx, :].mean()
+    
+    return total_power
+
+def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=1):
+    """
+    Process an epoch to extract band power features for each channel and frequency band.
+    
+    Parameters:
+    -----------
+    epoch : mne.Epochs
+        The EEG epoch to process.
+    freqBands : dict
+        Dictionary with band names as keys and (fmin, fmax) tuples as values.
+    method : str, optional
+        Method to compute PSD ('welch' or 'multitaper').
+    windowLength : float, optional
+        Length of the window for PSD calculation.
+    stepSize : float, optional
+        Step size for the window.
+    n_jobs : int, optional
+        Number of jobs to run in parallel.
+        
+    Returns:
+    --------
+    list
+        List of tuples: ((channel_name, band_name), feature_value)
+    """
+    # Determine the overall frequency range
+    fmin = min(band_range[0] for band_range in freqBands.values())
+    fmax = max(band_range[1] for band_range in freqBands.values())
+    
+    # Get channel names
+    channelNames = epoch.info['ch_names']
+    
+    # Compute PSD
+    psds, freqs = epoch.compute_psd(
+        method=method, 
+        picks='eeg', 
+        fmin=fmin, 
+        fmax=fmax, 
+        verbose=False
+    ).get_data(return_freqs=True)
+    
+    # Normalize the PSDs (per channel)
+    # This makes sure each channel's PSD sums to 1
+    normalPsds = psds / np.sum(psds, axis=-1, keepdims=True)
+    normalPsds = np.squeeze(normalPsds) 
+
+    # Extract features
+    features = []
+    
+    # Process each channel
+    for channel_idx, channel_name in enumerate(channelNames):
+        # Calculate each frequency band power
+        for band_name, (band_fmin, band_fmax) in freqBands.items():
+            band_power = bandPower(normalPsds, freqs, band_fmin, band_fmax, channel_idx)
+            features.append(((channel_name, band_name), [band_power])) #will add other stuff next to band power here so that it is iterable
+        
+            #MAKE IT SO THAT ITERABLE AND EACH CHANNEL NAME / DATAPOINT IS ITERABLE FOR SAME CHANNEL NAME BAND NAME AND BAND POWER !!
+        # Calculate total band power
+        total_power = totalBandPower(normalPsds, freqs, channel_idx)
+        features.append(((channel_name, 'Total'), [total_power])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
+    
+    return features
+
+
+    epochBandPower = allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5) #power all 19 channels for Delta Theta ALphba Beta and * Total power * 
+    # epochKurtosis = kurtosis(...)
+    # epochEntropy = entropy(...)
+    # ... 
+
+    # need to combine all the dataframes from each data point here 
+    
+    dataCombined = epochBandPower
+
+    return dataCombined
+
+
+
 
 '''
 Process's a specific subject 
