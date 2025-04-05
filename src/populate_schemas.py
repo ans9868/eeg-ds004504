@@ -187,6 +187,7 @@ if __name__ == "__main__":
     )
     print("Subject 001 test and show results") 
     result.show()
+    spark.stop()
 
 
 
