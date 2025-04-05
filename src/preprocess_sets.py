@@ -20,7 +20,22 @@ from joblib import Parallel, delayed
 #     ROOT_DIR = os.environ.get('EEG_DATA_ROOT', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-ROOT_DIR = '/Users/user/eeg-ds004504/'
+# TODO: need to make a script , to make it initiate and set hte ROOT_DIR 
+# ROOT_DIR = '/Users/user/eeg-ds004504/'
+ROOT_DIR = '/Users/admin/eeg-ds004504'
+
+# TODO : set something like this iono why is it such a hard problem stg
+# def setProjectRootDir(path=""):
+#     if path:
+#         ROOT_DIR = path
+#     else:
+#         print(os.getcwd())
+#         ROOT_DIR = os.getcwd()
+
+'''
+TODO: make the ROOT_DIR null and make it so that need to run function 'set_ROOT_DIR()' so that it is setup for subpath and the other stuff
+
+'''
 
 freqBands = {
     "Delta": (0.5, 4),
@@ -111,7 +126,7 @@ def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
 
 
 if __name__ == '__main__':
-
+    setProjectRootDir()
     participantsInfo = pd.read_table(participantsInfoPath())
 
 
