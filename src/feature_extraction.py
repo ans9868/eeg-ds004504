@@ -14,51 +14,6 @@ freqBands = {
     "Beta": (12, 30),
 }
 
-'''
-#Make a dicitonary of functions or ... how should we do each funciotn for feature extraction 
-def allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=-1):
-    fmin=freqBands['Delta'][0] 
-    fmax=freqBands['Beta'][1]
-    
-    channelNames = epoch.info['ch_names']
-    
-    psds, freqs = epoch.compute_psd(method=method, picks='eeg', fmin=fmin, fmax=fmax, verbose=False).get_data(return_freqs=True)
-
-    #normalize the psd's
-    psds /= np.sum(psds, axis=-1, keepdims=True)
-
-    # the band power of all the channels 
-    bandPowers = []
-    for band_idx, (band_name, (fmin, fmax)) in enumerate(freqBands.items()):
-        #the band power of a specific channel
-        bandPower = psds[:, :, (freqs >= fmin) & (freqs < fmax)].mean(axis=-1)
-        bandPower = np.squeeze(bandPower)
-
-        for channel_idx, channel_name in enumerate(channelNames):
-            bandPowers.append(((channel_name, band_name), (bandPower[channel_idx]))) 
-            # TODO: i put bandpower into a tupble  but this is a shortcut for now. We need to put all features into a tuple, not sure the best way to do that but it probably involves doing the PSD calculation in the main function
-            # *note* if do hte calculation in the main funciotn should try the 2 different methods
-    # this should be a dataframe with numpy array funciotns
-    # Channel {} band {} window power  [...]
-    return bandPowers  # Returns list of tuples: (channel, band) → PSD value
-
-
-def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=1):
-    epochBandPower = allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5) #power all 19 channels for Delta Theta ALphba Beta and * Total power * 
-    # epochKurtosis = kurtosis(...)
-    # epochEntropy = entropy(...)
-    # ... 
-
-    # need to combine all the dataframes from each data point here 
-    
-    dataCombined = epochBandPower
-
-    return dataCombined
-
-
-#BOUNDARY
-'''
-
 def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
    # Select the channel's PSD and the frequencies in the range
     band_mask = (freqs >= fmin) & (freqs < fmax)
@@ -135,19 +90,6 @@ def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, ste
         features.append(((channel_name, 'Total'), [total_power])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
     
     return features
-
-
-    epochBandPower = allBandPower(epoch, freqBands, method='welch', windowLength=3, stepSize=1.5) #power all 19 channels for Delta Theta ALphba Beta and * Total power * 
-    # epochKurtosis = kurtosis(...)
-    # epochEntropy = entropy(...)
-    # ... 
-
-    # need to combine all the dataframes from each data point here 
-    
-    dataCombined = epochBandPower
-
-    return dataCombined
-
 
 
 
