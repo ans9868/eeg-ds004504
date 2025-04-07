@@ -1,23 +1,59 @@
-# eeg-ds004504
+🧠 Project Summary: EEG Feature Extraction & Classification for Alzheimer's Detection
 
-Here we are automating the pipeline from the jupyter notebooks into highly expandable, readable and efficient code.
+This project uses data from the OpenNeuro dataset ds004504 (version 1.0.8), which contains resting-state EEG recordings from individuals with Alzheimer’s disease and age-matched healthy controls. The data is preprocessed and segmented into short epochs, enabling time-resolved analysis of spectral power features across various frequency bands (Delta, Theta, Alpha, Beta, and Total).
+📦 Dataset Description:
 
-\*\* Finished pipeline should look like this
-eeg-feature-pipeline/
-│
-├── notebooks/ # Your existing notebooks go here (still usable)
-│ ├── Baseline1.4.ipynb
-│ ├── Baseline-AD-CN-2.0PCA.ipynb
-│
-├── src/ # Python codebase
-│ ├── **init**.py
-│ ├── schema_definition.py # ← defines the Subject, Epoch, Feature schemas
-│ ├── populate_schemas.py # ← populates those tables from EEG data
-│ ├── feature_extraction.py # ← general feature pipeline (already done!)
-│ ├── feature_methods.py # ← PCA, ICA, t-SNE, etc. (dimensionality reduction)
-│ ├── preprocess_sets.py # ← loading/preprocessing EEG (already done!)
-│ └── modeling.py # ← KNN, SVM, trees, cross-validation, etc.
-│
-├── main_pipeline.py # ← entry script to run full pipeline
-├── requirements.txt # ← dependencies for portability
-└── README.md # ← overview, setup instructions
+    Subjects: Individuals with Alzheimer's and healthy controls
+
+    Modality: EEG recordings from multiple scalp electrodes
+
+    Sampling: Preprocessed into epochs (time segments)
+
+    Groups:
+
+        Group A: Alzheimer's
+
+        Group C: Control
+
+Each row in the processed dataset represents an (EpochID, SubjectID) combination with computed power values across electrodes and frequency bands.
+🛠️ Tools & Technologies Used:
+
+    Apache Spark (PySpark):
+    For distributed data handling, preprocessing, and scalable ML workflows
+
+    pandas:
+    For lightweight data manipulation and .pkl I/O
+
+    NumPy:
+    For PCA and numerical analysis
+
+    scikit-learn:
+    For evaluation metrics like classification_report and accuracy
+
+    Matplotlib:
+    For plotting PCA explained variance and diagnostics
+
+    PySpark MLlib:
+    Used for dimensionality reduction (PCA) and classification (Multilayer Perceptron)
+
+🧪 Workflow Highlights:
+
+    Group Filtering: Alzheimer's and control groups are separated and labeled.
+
+    Feature Normalization: Power features are z-scored using training-set statistics.
+
+    Dimensionality Reduction: PCA is applied to reduce feature dimensionality while preserving variance.
+
+    Classification: A PySpark MultilayerPerceptronClassifier is trained to distinguish between groups.
+
+    Train/Test Splitting: Custom subject-based splitting ensures no overlap in evaluation.
+
+    Evaluation: Classification performance is assessed using AUC and classification_report.
+
+📓 Notebooks
+
+Two example notebooks are included to illustrate the workflow:
+
+    Example_Data_Creation.ipynb – Prepares features, labels, and saves datasets as .pkl
+
+    Example_Data_Preprocessing+ML.ipynb – Performs PCA, trains a classifier, and evaluates model performance.
