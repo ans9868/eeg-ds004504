@@ -1,0 +1,17 @@
+data_path: /Users/user/eeg-ds004504
+derivatives: true
+freqBands:
+  Alpha:
+  - 8
+  - 12
+  Beta:
+  - 12
+  - 30
+  Delta:
+  - 0.5
+  - 4
+  Theta:
+  - 4
+  - 8
+stepSize: 1.5
+windowLength: 3
