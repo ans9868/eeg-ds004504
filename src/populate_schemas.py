@@ -59,7 +59,6 @@ def extract_features_udtf(pdf):
     import time
     from feature_extraction import processEpoch, processSub
     from schema_definition import get_feature_schema, get_subject_schema
-    print("function ran")
     rows = []
     start = time.time()
     for _, row in pdf.iterrows():

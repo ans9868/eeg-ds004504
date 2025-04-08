@@ -6,34 +6,36 @@ import os
 import time
 from joblib import Parallel, delayed 
 
-# ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+# DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 # print(os.getcwd())
-# from __init__.py import ROOT_DIR  # Import the path from __init__.py
+# from __init__.py import DATA_PATH  # Import the path from __init__.py
 
-# only get ROOT_DIR from __init__.py if I am run as a module 
+# only get DATA_PATH from __init__.py if I am run as a module 
 
 # try:
 #     # Try to import from the package first
-#     from . import ROOT_DIR
+#     from . import DATA_PATH
 # except ImportError:
 #     # If that fails, set it directly
-#     ROOT_DIR = os.environ.get('EEG_DATA_ROOT', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#     DATA_PATH = os.environ.get('EEG_DATA_ROOT', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 
-# TODO: need to make a script , to make it initiate and set hte ROOT_DIR 
-# ROOT_DIR = '/Users/user/eeg-ds004504/'
-ROOT_DIR = '/Users/admin/eeg-ds004504'
+# TODO: need to make a script , to make it initiate and set hte DATA_PATH 
+# DATA_PATH = '/Users/user/eeg-ds004504/'
+
+# DATA_PATH = '/Users/admin/eeg-ds004504'
+DATA_PATH = '/Users/user/eeg-ds004504/'
 
 # TODO : set something like this iono why is it such a hard problem stg
 # def setProjectRootDir(path=""):
 #     if path:
-#         ROOT_DIR = path
+#         DATA_PATH = path
 #     else:
 #         print(os.getcwd())
-#         ROOT_DIR = os.getcwd()
+#         DATA_PATH = os.getcwd()
 
 '''
-TODO: make the ROOT_DIR null and make it so that need to run function 'set_ROOT_DIR()' so that it is setup for subpath and the other stuff
+TODO: make the DATA_PATH null and make it so that need to run function 'set_DATA_PATH()' so that it is setup for subpath and the other stuff
 
 '''
 
@@ -44,17 +46,25 @@ freqBands = {
     "Beta": (12, 30),
 }
 
+# def set_data_path(path):
+#     global DATA_PATH
+#     DATA_PATH = path
+
+def get_data_path():
+    return DATA_PATH
+
 def subPath(sub, derivatives=True):
     print("subPath", sub)
-    # print("ROOT_DIR from __init__", ROOT_DIR)
+    print("subPath DATA_PATH", DATA_PATH)
+    # print("DATA_PATH from __init__", DATA_PATH)
     
     # Strip 'sub-' prefix if it exists
     sub_id = sub.replace('sub-', '') if isinstance(sub, str) and sub.startswith('sub-') else sub
     
     if derivatives:
-       path = os.path.join(ROOT_DIR, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
+       path = os.path.join(DATA_PATH, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     else:
-       path = os.path.join(ROOT_DIR, 'ds004504', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
+       path = os.path.join(DATA_PATH, 'ds004504', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     
     if not os.path.exists(path):
         raise FileNotFoundError(f'The path was not found for {sub}, path: {path}')
@@ -62,7 +72,7 @@ def subPath(sub, derivatives=True):
     return path
 
 def participantsInfoPath():
-    return os.path.join(ROOT_DIR, 'ds004504', 'participants.tsv')
+    return os.path.join(DATA_PATH, 'ds004504', 'participants.tsv')
 
 '''
 ProcessSub gets the power density from a subject. It has 3 modes. Generator, sequential or parallel.
@@ -126,7 +136,6 @@ def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
 
 
 if __name__ == '__main__':
-    setProjectRootDir()
     participantsInfo = pd.read_table(participantsInfoPath())
 
 
