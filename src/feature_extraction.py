@@ -12,8 +12,8 @@ try:
     from src.preprocess_sets import processSub, participantsInfoPath
 except ImportError:
     # When run inside Spark workers (which get flat files via sc.addPyFile)
-    from config_handler import load_config, initiate_config
     from preprocess_sets import processSub, participantsInfoPath
+    from config_handler import load_config, initiate_config
 
 
 try:
@@ -28,7 +28,7 @@ freqBands = config['freqBands']
 windowLength = config['windowLength']
 stepSize = config['stepSize']
 method = config['method']
-
+print(f"Config using in feature Extraction.py {config}")
 
 def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
    # Select the channel's PSD and the frequencies in the range

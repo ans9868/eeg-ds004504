@@ -2,17 +2,17 @@ data_path: /Users/admin/eeg-ds004504
 derivatives: true
 freqBands:
   Alpha:
-  - 8
-  - 12
+    - 8
+    - 12
   Beta:
-  - 12
-  - 30
+    - 12
+    - 30
   Delta:
-  - 0.5
-  - 4
+    - 0.5
+    - 4
   Theta:
-  - 4
-  - 8
+    - 4
+    - 8
 method: welch
-stepSize: 1.5
+stepSize: 2.7
 windowLength: 3
