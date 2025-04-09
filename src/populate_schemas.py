@@ -1,8 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import pandas_udf, PandasUDFType
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, ArrayType, MapType
-from schema_definition import get_subject_schema, get_feature_schema
-from feature_extraction import processEpoch, processSub
 import pandas as pd
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
@@ -22,12 +20,18 @@ from pyspark.sql import DataFrame
 # sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../src/")))
 #
 
-from src.feature_extraction import processEpoch, processSub
-from src.schema_definition import get_feature_schema, get_subject_schema
-from src.preprocess_sets import subPath, participantsInfoPath, processSubPSDs, processSub
+try:
+    from src.feature_extraction import processEpoch, processSub
+    from src.schema_definition import get_feature_schema, get_subject_schema
+    from src.preprocess_sets import subPath, participantsInfoPath, processSubPSDs, processSub
+    from src.config_handler import load_config, initiate_config
+except ImportError:
+    from feature_extraction import processEpoch, processSub
+    from schema_definition import get_feature_schema, get_subject_schema
+    from preprocess_sets import subPath, participantsInfoPath, processSubPSDs, processSub
+    from config_handler import load_config, initiate_config
 
-# just to make sure this is here for the other files
-from src.config_handler import load_config, initiate_config
+
 try:
     config = load_config()
 except RuntimeError:
@@ -59,9 +63,6 @@ def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFram
     return spark.createDataFrame(records, schema=get_subject_schema())
 
 
-import time
-from src.feature_extraction import processEpoch, processSub
-from src.schema_definition import get_feature_schema, get_subject_schema
 
 
 @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
