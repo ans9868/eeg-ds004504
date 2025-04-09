@@ -128,6 +128,8 @@ def extract_features_udtf(pdf):
     result_df = pd.DataFrame(rows, columns=column_names)
     # print(f"Result DataFrame shape: {result_df.shape}")
     print(time.time() - start)
+    print(rows[0])
+    print(schema_fields)
     return result_df
 
 

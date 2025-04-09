@@ -40,10 +40,22 @@ def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
     return band_power
 
 
+# check, this might just be all zeros after normliziatoin 
 def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mean across all frequencies to be consistent
     total_power = normalPsd[channel_idx, :].mean()
     
     return total_power
+
+def totalEnergy(normalPsd, freqs, channel_idx=0):
+    '''
+    Compute the total energy of the EEG signal for a specific channel.
+    Total energy is defined as the sum of the squared amplitude over time.     
+    '''
+   
+    channel_signal = normalPsd[channel_idx, :]
+    energy = np.sum(np.square(channel_signal))
+    return energy
+
 
 def processEpoch(epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     """
@@ -103,7 +115,8 @@ def processEpoch(epoch, freqBands=freqBands, method=method, windowLength=windowL
             #MAKE IT SO THAT ITERABLE AND EACH CHANNEL NAME / DATAPOINT IS ITERABLE FOR SAME CHANNEL NAME BAND NAME AND BAND POWER !!
         # Calculate total band power
         total_power = totalBandPower(normalPsds, freqs, channel_idx)
-        features.append(((channel_name, 'Total'), [total_power])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
+        total_energy = totalEnergy(normalPsds, freqs, channel_idx)
+        features.append(((channel_name, 'Total'), [total_power, total_energy])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
     
     return features
 

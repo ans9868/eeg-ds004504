@@ -14,7 +14,8 @@ def get_feature_schema():
         StructField("EpochID", StringType(), False),
         StructField("WaveBand", StringType(), False),
         StructField("Electrode", StringType(), False),
-        StructField("Power", DoubleType(), True) # TODO: Change to DoubleType pro's and cons... is the rounding a big deal ? 
+        StructField("Power", DoubleType(), True), # TODO: Change to DoubleType pro's and cons... is the rounding a big deal ? 
+        StructField("Energy", DoubleType(), True) # TODO: Change to DoubleType pro's and cons... is the rounding a big deal ? 
         #     StructField("Skewness", FloatType(), True),
     #     StructField("Kurtosis", FloatType(), True),
     #     StructField("Variance", FloatType(), True),

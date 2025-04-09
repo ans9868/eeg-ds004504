@@ -1,0 +1,276 @@
+
+
+=== MODEL PERFORMANCE SUMMARY ===
+
+Model: Neural Network
+  AUC:      0.7260
+  Accuracy: 0.6838
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.74      0.65      0.69      1112
+ Alzheimer's       0.63      0.72      0.68       925
+
+    accuracy                           0.68      2037
+   macro avg       0.69      0.69      0.68      2037
+weighted avg       0.69      0.68      0.68      2037
+
+
+Model: Gradient Boosted Trees
+  AUC:      0.7426
+  Accuracy: 0.6716
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.75      0.60      0.67      1112
+ Alzheimer's       0.61      0.75      0.68       925
+
+    accuracy                           0.67      2037
+   macro avg       0.68      0.68      0.67      2037
+weighted avg       0.69      0.67      0.67      2037
+
+
+Model: Decision Tree
+  AUC:      0.6527
+  Accuracy: 0.6146
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.67      0.58      0.62      1112
+ Alzheimer's       0.57      0.65      0.61       925
+
+    accuracy                           0.61      2037
+   macro avg       0.62      0.62      0.61      2037
+weighted avg       0.62      0.61      0.62      2037
+
+
+Model: SVM
+  AUC:      0.7015
+  Accuracy: 0.5542
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.73      0.29      0.42      1112
+ Alzheimer's       0.51      0.87      0.64       925
+
+    accuracy                           0.55      2037
+   macro avg       0.62      0.58      0.53      2037
+weighted avg       0.63      0.55      0.52      2037
+
+
+Model: Approximate KNN
+  AUC:      N/A
+  Accuracy: 0.5965
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.64      0.61      0.62      1112
+ Alzheimer's       0.55      0.58      0.57       925
+
+    accuracy                           0.60      2037
+   macro avg       0.59      0.60      0.59      2037
+weighted avg       0.60      0.60      0.60      2037
+
+
+
+=== ACTIVE CONFIGURATION ===
+{'data_path': '/Users/admin/eeg-ds004504',
+ 'derivatives': False,
+ 'freqBands': {'Alpha': [8, 12],
+               'Beta': [12, 30],
+               'Delta': [0.5, 4],
+               'Theta': [4, 8]},
+ 'method': 'welch',
+ 'stepSize': 1.5,
+ 'windowLength': 3}
+
+Current date and time: 2025-04-09 13:26:54.268856
+
+
+=== MODEL PERFORMANCE SUMMARY ===
+
+Model: Neural Network
+  AUC:      0.7374
+  Accuracy: 0.6784
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.73      0.65      0.69      1112
+ Alzheimer's       0.63      0.72      0.67       925
+
+    accuracy                           0.68      2037
+   macro avg       0.68      0.68      0.68      2037
+weighted avg       0.69      0.68      0.68      2037
+
+
+Model: Gradient Boosted Trees
+  AUC:      0.7198
+  Accuracy: 0.6456
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.73      0.56      0.63      1112
+ Alzheimer's       0.59      0.75      0.66       925
+
+    accuracy                           0.65      2037
+   macro avg       0.66      0.65      0.65      2037
+weighted avg       0.66      0.65      0.64      2037
+
+
+Model: Decision Tree
+  AUC:      0.6136
+  Accuracy: 0.6141
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.69      0.54      0.61      1112
+ Alzheimer's       0.56      0.70      0.62       925
+
+    accuracy                           0.61      2037
+   macro avg       0.62      0.62      0.61      2037
+weighted avg       0.63      0.61      0.61      2037
+
+
+Model: SVM
+  AUC:      0.6876
+  Accuracy: 0.5542
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.73      0.29      0.42      1112
+ Alzheimer's       0.51      0.87      0.64       925
+
+    accuracy                           0.55      2037
+   macro avg       0.62      0.58      0.53      2037
+weighted avg       0.63      0.55      0.52      2037
+
+
+Model: Approximate KNN
+  AUC:      N/A
+  Accuracy: 0.5891
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.63      0.61      0.62      1112
+ Alzheimer's       0.55      0.56      0.55       925
+
+    accuracy                           0.59      2037
+   macro avg       0.59      0.59      0.59      2037
+weighted avg       0.59      0.59      0.59      2037
+
+
+
+=== ACTIVE CONFIGURATION ===
+{'data_path': '/Users/admin/eeg-ds004504',
+ 'derivatives': False,
+ 'freqBands': {'Alpha': [8, 12],
+               'Beta': [12, 30],
+               'Delta': [0.5, 4],
+               'Theta': [4, 8]},
+ 'method': 'welch',
+ 'stepSize': 1.5,
+ 'windowLength': 3}
+
+Current date and time: 2025-04-09 13:38:35.635698
+
+
+=== MODEL PERFORMANCE SUMMARY ===
+
+Model: Neural Network
+  AUC:      0.7066
+  Accuracy: 0.6632
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.72      0.62      0.67      1112
+ Alzheimer's       0.61      0.71      0.66       925
+
+    accuracy                           0.66      2037
+   macro avg       0.67      0.67      0.66      2037
+weighted avg       0.67      0.66      0.66      2037
+
+
+Model: Gradient Boosted Trees
+  AUC:      0.7336
+  Accuracy: 0.6627
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.74      0.59      0.66      1112
+ Alzheimer's       0.60      0.75      0.67       925
+
+    accuracy                           0.66      2037
+   macro avg       0.67      0.67      0.66      2037
+weighted avg       0.68      0.66      0.66      2037
+
+
+Model: Decision Tree
+  AUC:      0.6815
+  Accuracy: 0.6254
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.69      0.58      0.63      1112
+ Alzheimer's       0.57      0.68      0.62       925
+
+    accuracy                           0.63      2037
+   macro avg       0.63      0.63      0.63      2037
+weighted avg       0.63      0.63      0.63      2037
+
+
+Model: SVM
+  AUC:      0.7015
+  Accuracy: 0.5542
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.73      0.29      0.42      1112
+ Alzheimer's       0.51      0.87      0.64       925
+
+    accuracy                           0.55      2037
+   macro avg       0.62      0.58      0.53      2037
+weighted avg       0.63      0.55      0.52      2037
+
+
+Model: Approximate KNN
+  AUC:      N/A
+  Accuracy: 0.6024
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.65      0.60      0.62      1112
+ Alzheimer's       0.56      0.60      0.58       925
+
+    accuracy                           0.60      2037
+   macro avg       0.60      0.60      0.60      2037
+weighted avg       0.61      0.60      0.60      2037
+
+
+
+=== ACTIVE CONFIGURATION ===
+{'data_path': '/Users/admin/eeg-ds004504',
+ 'derivatives': False,
+ 'freqBands': {'Alpha': [8, 12],
+               'Beta': [12, 30],
+               'Delta': [0.5, 4],
+               'Theta': [4, 8]},
+ 'method': 'welch',
+ 'stepSize': 1.5,
+ 'windowLength': 3}
+
+Current date and time: 2025-04-09 14:21:56.917294
