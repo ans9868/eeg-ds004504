@@ -14,15 +14,25 @@ from pyspark.sql import SparkSession
 from pyspark.sql import DataFrame
 
 
+
+
 # Add the src/ directory to the Python path
 # import sys
 # import os
 # sys.path.append(os.path.abspath(os.path.join(os.getcwd(), "../src/")))
 #
 
-from feature_extraction import processEpoch, processSub
-from schema_definition import get_feature_schema, get_subject_schema
-from preprocess_sets import subPath, participantsInfoPath, processSubPSDs, processSub
+from src.feature_extraction import processEpoch, processSub
+from src.schema_definition import get_feature_schema, get_subject_schema
+from src.preprocess_sets import subPath, participantsInfoPath, processSubPSDs, processSub
+
+# just to make sure this is here for the other files
+from src.config_handler import load_config, initiate_config
+try:
+    config = load_config()
+except RuntimeError:
+    config = initiate_config()
+
 
 def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFrame:
     """
@@ -50,8 +60,8 @@ def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFram
 
 
 import time
-from feature_extraction import processEpoch, processSub
-from schema_definition import get_feature_schema, get_subject_schema
+from src.feature_extraction import processEpoch, processSub
+from src.schema_definition import get_feature_schema, get_subject_schema
 
 
 @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
@@ -121,7 +131,6 @@ def extract_features_udtf(pdf):
 
 
 if __name__ == "__main__":
-    import sys
     import os
     import time
     from pyspark.sql import SparkSession

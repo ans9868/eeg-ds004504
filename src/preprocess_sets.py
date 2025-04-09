@@ -6,65 +6,45 @@ import os
 import time
 from joblib import Parallel, delayed 
 
-# DATA_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-# print(os.getcwd())
-# from __init__.py import DATA_PATH  # Import the path from __init__.py
-
-# only get DATA_PATH from __init__.py if I am run as a module 
-
-# try:
-#     # Try to import from the package first
-#     from . import DATA_PATH
-# except ImportError:
-#     # If that fails, set it directly
-#     DATA_PATH = os.environ.get('EEG_DATA_ROOT', os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+try:
+    # When run as part of a package (local scripts, Jupyter, etc.)
+    from src.config_handler import initiate_config, load_config
+except ImportError:
+    # When run inside Spark workers (which get flat files via sc.addPyFile)
+    from config_handler import initiate_config, load_config
 
 
-# TODO: need to make a script , to make it initiate and set hte DATA_PATH 
-# DATA_PATH = '/Users/user/eeg-ds004504/'
+try:
+    config = load_config()
+except RuntimeError:
+    print("Config not found in feature_extraction.py")
+    config = initiate_config()
 
-# DATA_PATH = '/Users/admin/eeg-ds004504'
-DATA_PATH = '/Users/user/eeg-ds004504/'
 
-# TODO : set something like this iono why is it such a hard problem stg
-# def setProjectRootDir(path=""):
-#     if path:
-#         DATA_PATH = path
-#     else:
-#         print(os.getcwd())
-#         DATA_PATH = os.getcwd()
+config = load_config()
+data_path = config['data_path']
+derivatives = config['derivatives']
+freqBands = config['freqBands']
+windowLength = config['windowLength']
+stepSize = config['stepSize']
+method = config['stepSize']
 
-'''
-TODO: make the DATA_PATH null and make it so that need to run function 'set_DATA_PATH()' so that it is setup for subpath and the other stuff
-
-'''
-
-freqBands = {
-    "Delta": (0.5, 4),
-    "Theta": (4, 8),
-    "Alpha": (8, 12),
-    "Beta": (12, 30),
-}
-
-# def set_data_path(path):
-#     global DATA_PATH
-#     DATA_PATH = path
 
 def get_data_path():
-    return DATA_PATH
+    return data_path
 
 def subPath(sub, derivatives=True):
     print("subPath", sub)
-    print("subPath DATA_PATH", DATA_PATH)
-    # print("DATA_PATH from __init__", DATA_PATH)
+    print("subPath data_path", data_path)
+    # print("data_path from __init__", data_path)
     
     # Strip 'sub-' prefix if it exists
     sub_id = sub.replace('sub-', '') if isinstance(sub, str) and sub.startswith('sub-') else sub
     
     if derivatives:
-       path = os.path.join(DATA_PATH, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
+       path = os.path.join(data_path, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     else:
-       path = os.path.join(DATA_PATH, 'ds004504', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
+       path = os.path.join(data_path, 'ds004504', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     
     if not os.path.exists(path):
         raise FileNotFoundError(f'The path was not found for {sub}, path: {path}')
@@ -72,7 +52,7 @@ def subPath(sub, derivatives=True):
     return path
 
 def participantsInfoPath():
-    return os.path.join(DATA_PATH, 'ds004504', 'participants.tsv')
+    return os.path.join(data_path, 'ds004504', 'participants.tsv')
 
 '''
 ProcessSub gets the power density from a subject. It has 3 modes. Generator, sequential or parallel.
@@ -82,7 +62,7 @@ def _psd_generator(epochs, compute_psd):
     for i in range(len(epochs)):
         yield compute_psd(epochs[i])
 
-def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSize=1.5, mode='generator', n_jobs=1):
+def processSubPSDs(sub, derivatives=True, method=method, windowLength=windowLength, stepSize=stepSize, mode='generator', n_jobs=1):
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']
 
@@ -118,7 +98,7 @@ def processSubPSDs(sub, derivatives=True, method='welch', windowLength=3, stepSi
 '''
 This is for processing the subject without getting the psd's. It gets all the epochs for the subject.
 '''
-def processSub(sub, derivatives=True, windowLength=3, stepSize=1.5):
+def processSub(sub, derivatives=derivatives, windowLength=windowLength, stepSize=stepSize):
     print("processSub", sub)
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']

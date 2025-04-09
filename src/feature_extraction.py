@@ -5,14 +5,30 @@ import mne
 import os
 import time
 from joblib import Parallel, delayed 
-from preprocess_sets import processSub, participantsInfoPath
 
-freqBands = {
-    "Delta": (0.5, 4),
-    "Theta": (4, 8),
-    "Alpha": (8, 12),
-    "Beta": (12, 30),
-}
+try:
+    # When run as part of a package (local scripts, Jupyter, etc.)
+    from src.config_handler import load_config, initiate_config
+    from src.preprocess_sets import processSub, participantsInfoPath
+except ImportError:
+    # When run inside Spark workers (which get flat files via sc.addPyFile)
+    from config_handler import load_config, initiate_config
+    from preprocess_sets import processSub, participantsInfoPath
+
+
+try:
+    config = load_config()
+except RuntimeError:
+    print("Config not found in feature_extraction.py")
+    config = initiate_config()
+
+
+config = load_config()
+freqBands = config['freqBands']
+windowLength = config['windowLength']
+stepSize = config['stepSize']
+method = config['method']
+
 
 def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
    # Select the channel's PSD and the frequencies in the range
@@ -29,7 +45,7 @@ def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mea
     
     return total_power
 
-def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=1):
+def processEpoch(epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     """
     Process an epoch to extract band power features for each channel and frequency band.
     
@@ -40,7 +56,7 @@ def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, ste
     freqBands : dict
         Dictionary with band names as keys and (fmin, fmax) tuples as values.
     method : str, optional
-        Method to compute PSD ('welch' or 'multitaper').
+        Method to compute PSD (method or 'multitaper').
     windowLength : float, optional
         Length of the window for PSD calculation.
     stepSize : float, optional
@@ -100,7 +116,7 @@ def processSubject(subject, n_jobs=-1, freqBands=freqBands):
     start = time.time()    
 
     epochs = processSub(subject)
-    epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method='welch') for x in range(len(epochs)))
+    epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method=method) for x in range(len(epochs)))
     # processedEpoch = processEpoch(epochs[0], freqBands)
    
     print(f"processSubject {subject}:", time.time()-start)
@@ -119,11 +135,8 @@ def processSubjects(subjectList, n_jobs=-1):
     return allResults
 
 
-
-
-
 if __name__ == '__main__':
-
+    initiate_config()
     participantsInfo = pd.read_table(participantsInfoPath())
     A_sub = participantsInfo[participantsInfo["Group"] == "A"]["participant_id"].tolist()
 
