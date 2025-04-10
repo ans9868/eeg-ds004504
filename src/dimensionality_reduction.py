@@ -4,51 +4,74 @@ from pyspark.ml.functions import vector_to_array
 from pyspark.sql.types import IntegerType
 
 
-# from pyspark.sql.functions import when
+# TODO: make config for variance target 
 
-# this z-scores all the data between 2 datasets - tested works 
-def normalize_power(df_0, df_1):
-    from pyspark.sql.functions import mean as _mean, stddev as _stddev, broadcast, when
+
+from pyspark.sql.functions import col, min as _min, max as _max, broadcast, when
+
+def min_max_normalize(train_df, test_df, feature_cols, target_min=-1.0, target_max=1.0):
+    # 1. Compute min and max for each feature on the training set only
+    stats_exprs = [
+        _min(c).alias(f"{c}_min") for c in feature_cols
+    ] + [
+        _max(c).alias(f"{c}_max") for c in feature_cols
+    ]
+    stats = train_df.agg(*stats_exprs).collect()[0]
+    
+    # 2. Normalize both train and test using train stats
+    def apply_minmax(df):
+        for c in feature_cols:
+            col_min = float(stats[f"{c}_min"])
+            col_max = float(stats[f"{c}_max"])
+            range_val = col_max - col_min if col_max != col_min else 1.0  # avoid div by 0
+
+            df = df.withColumn(
+                c,
+                ((col(c) - col_min) / range_val) * (target_max - target_min) + target_min
+            )
+        return df
+
+    return apply_minmax(train_df), apply_minmax(test_df)
+
+
+
+def normalize_by_column(train_df, test_df, feature_cols):
+    from pyspark.sql.functions import col, mean as _mean, stddev as _stddev, broadcast, when, first
     from pyspark.sql.types import FloatType
 
-    df_0 = df_0.withColumn("Power", col("Power").cast(FloatType())) # cast as a 4 byte number 
-    df_1 = df_1.withColumn("Power", col("Power").cast(FloatType()))
+    # Cast all feature columns to float
+    for col_name in feature_cols:
+        train_df = train_df.withColumn(col_name, col(col_name).cast(FloatType()))
+        test_df = test_df.withColumn(col_name, col(col_name).cast(FloatType()))
 
-    stats = df_0.groupBy("Electrode", "WaveBand").agg(
-        _mean("Power").alias("mean_power"),
-        _stddev("Power").alias("std_power")
+    # Melt train df into long format
+    train_long = train_df.select("SubjectID", "EpochID", "label", *feature_cols) \
+        .selectExpr("SubjectID", "EpochID", "label", "stack({0}, {1}) as (pivot, value)".format(
+            len(feature_cols),
+            ', '.join([f"'{c}', `{c}`" for c in feature_cols])
+        ))
+
+    # Compute normalization stats
+    stats = train_long.groupBy("pivot").agg(
+        _mean("value").alias("mean_val"),
+        _stddev("value").alias("std_val")
     )
 
-    #2 more rows created mean and std power for each electrod and waveband
-    df_0 = df_0.join(broadcast(stats), on=["Electrode", "WaveBand"]) 
-    df_1 = df_1.join(broadcast(stats), on=["Electrode", "WaveBand"])
+    # Normalize and pivot back (can be slow for large data)
+    def apply_normalization(df):
+        long_df = df.select("SubjectID", "EpochID", "label", *feature_cols) \
+            .selectExpr("SubjectID", "EpochID", "label", "stack({0}, {1}) as (pivot, value)".format(
+                len(feature_cols),
+                ', '.join([f"'{c}', `{c}`" for c in feature_cols])
+            ))
+        long_df = long_df.join(broadcast(stats), on="pivot")
+        long_df = long_df.withColumn(
+            "norm_value",
+            (col("value") - col("mean_val")) / when((col("std_val").isNotNull()) & (col("std_val") != 0), col("std_val")).otherwise(1.0)
+        )
+        return long_df.groupBy("SubjectID", "EpochID", "label").pivot("pivot").agg(first("norm_value")).fillna(0.0)
 
-    # the .otherwise 1.0 makes it so that if the std power is 0 or null , then make it 1 , 
-    # if std is 0 or null it means no varience in that variable (currnt_val == avg) and  so the result(s) in that column will be 0 as (currnet_val - mean) / 1 = 0
-    df_0 = df_0.withColumn("Power", (col("Power") - col("mean_power")) / when((col("std_power").isNotNull()) & (col("std_power") != 0), col("std_power")).otherwise(1.0))
-    df_1 = df_1.withColumn("Power", (col("Power") - col("mean_power")) / when((col("std_power").isNotNull()) & (col("std_power") != 0), col("std_power")).otherwise(1.0))
-
-    # drop the mean and the std_power 
-    df_0 = df_0.drop("mean_power", "std_power")
-    df_1 = df_1.drop("mean_power", "std_power")
-    return df_0, df_1
-
-
-
-def prepare_features_for_pca(df):
-    from pyspark.sql.functions import concat_ws
-
-    df = df.withColumn("Electrode_WaveBand", concat_ws("_", "Electrode", "WaveBand"))
-    pivot_keys = [row["Electrode_WaveBand"] for row in df.select("Electrode_WaveBand").distinct().collect()]
-
-    features_df = (
-        df.groupBy("SubjectID", "EpochID", "label")
-        .pivot("Electrode_WaveBand", pivot_keys)
-        .agg({"Power": "first"})
-        .fillna(0.0)
-    )
-    feature_cols = [c for c in features_df.columns if c not in ("SubjectID", "EpochID", "label")]
-    return features_df, feature_cols
+    return apply_normalization(train_df), apply_normalization(test_df)
 
 def fit_pca_model(target_df, feature_cols, variance_target=0.95):
     from pyspark.ml.feature import PCA, VectorAssembler
@@ -89,74 +112,50 @@ def apply_pca_model(target_df, pca_cols, pca_model, k):
     return final_df
 
 
+# ********************************* !! DEPRECATED !! ***********************************************
+
+# this z-scores all the data between 2 datasets - tested works 
+def normalize_power(train_spark_df, test_spark_df):
+    from pyspark.sql.functions import mean as _mean, stddev as _stddev, broadcast, when
+    from pyspark.sql.types import FloatType
+
+    train_spark_df = train_spark_df.withColumn("Power", col("Power").cast(FloatType())) # cast as a 4 byte number 
+    test_spark_df = test_spark_df.withColumn("Power", col("Power").cast(FloatType()))
+
+    # Notice how our stats are only from the training group
+    stats = train_spark_df.groupBy("Electrode", "WaveBand").agg(
+        _mean("Power").alias("mean_power"),
+        _stddev("Power").alias("std_power")
+    )
+
+    #2 more rows created mean and std power for each electrod and waveband
+    train_spark_df = train_spark_df.join(broadcast(stats), on=["Electrode", "WaveBand"]) 
+    test_spark_df = test_spark_df.join(broadcast(stats), on=["Electrode", "WaveBand"])
+
+    # the .otherwise 1.0 makes it so that if the std power is 0 or null , then make it 1 , 
+    # if std is 0 or null it means no varience in that variable (currnt_val == avg) and  so the result(s) in that column will be 0 as (currnet_val - mean) / 1 = 0
+    train_spark_df = train_spark_df.withColumn("Power", (col("Power") - col("mean_power")) / when((col("std_power").isNotNull()) & (col("std_power") != 0), col("std_power")).otherwise(1.0))
+    test_spark_df = test_spark_df.withColumn("Power", (col("Power") - col("mean_power")) / when((col("std_power").isNotNull()) & (col("std_power") != 0), col("std_power")).otherwise(1.0))
+
+    # drop the mean and the std_power 
+    train_spark_df = train_spark_df.drop("mean_power", "std_power")
+    test_spark_df = test_spark_df.drop("mean_power", "std_power")
+    return train_spark_df, test_spark_df
 
 
 
+def prepare_features_for_pca(df):
+    from pyspark.sql.functions import concat_ws
 
-# def apply_pca_model(target_df, pca_cols, pca_model, k):
-#     from pyspark.ml.feature import VectorAssembler
-#     from pyspark.ml.functions import vector_to_array
-#     from pyspark.sql.functions import col
-#
-#     assembler = VectorAssembler(inputCols=pca_cols, outputCol="features")
-#     assembled_df = assembler.transform(target_df).select("features", "label")
-#     
-#
-#     transformed = pca_model.transform(assembled_df).withColumn("pca_array", vector_to_array("pca_features"))
-#     for i in range(k):
-#         transformed = transformed.withColumn(f"PC{i+1}", col("pca_array")[i])
-#     
-#     assembled_df.withColumn("label", assembled_df["label"].cast(IntegerType()))
-#
-#     return transformed.select("label", *[f"PC{i+1}" for i in range(k)])
-#
+    df = df.withColumn("Electrode_WaveBand", concat_ws("_", "Electrode", "WaveBand"))
+    pivot_keys = [row["Electrode_WaveBand"] for row in df.select("Electrode_WaveBand").distinct().collect()]
 
-
-
-
-
-
-
-
-
-
-
-
-# def apply_pca(result_group_a, result_group_c, spark, variance_target=0.95):
-#     import numpy as np
-#     df_a, df_c = normalize_power(result_group_a, result_group_c)
-#     df_a = df_a.withColumn("label", lit(0))
-#     df_c = df_c.withColumn("label", lit(1))
-#     full_df = df_a.union(df_c)
-#
-#     full_df = full_df.withColumn("Electrode_WaveBand", concat_ws("_", "Electrode", "WaveBand"))
-#     pivot_keys = [row["Electrode_WaveBand"] for row in full_df.select("Electrode_WaveBand").distinct().collect()]
-#
-#     features_df = (
-#         full_df.groupBy("SubjectID", "EpochID", "label")
-#         .pivot("Electrode_WaveBand", pivot_keys)
-#         .agg({"Power": "first"})
-#         .fillna(0.0)
-#     )
-#
-#     feature_cols = [c for c in features_df.columns if c not in ("SubjectID", "EpochID", "label")]
-#     assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
-#     assembled_df = assembler.transform(features_df).select("SubjectID", "EpochID", "label", "features")
-#
-#     k_max = len(feature_cols)
-#     pca_model = PCA(k=k_max, inputCol="features", outputCol="pca_features").fit(assembled_df)
-#     explained = pca_model.explainedVariance.toArray()
-#     k_vals = next(i for i, x in enumerate(np.cumsum(explained)) if x >= variance_target) + 1
-#
-#     pca_model = PCA(k=k_vals, inputCol="features", outputCol="pca_features").fit(assembled_df)
-#     pca_result = pca_model.transform(assembled_df)
-#
-#     pca_result = pca_result.withColumn("pca_array", vector_to_array("pca_features"))
-#     for i in range(k_vals):
-#         pca_result = pca_result.withColumn(f"PC{i+1}", col("pca_array")[i])
-#
-#     return pca_result.select("SubjectID", "EpochID", "label", *[f"PC{i+1}" for i in range(k_vals)])
-#
-
-
+    features_df = (
+        df.groupBy("SubjectID", "EpochID", "label")
+        .pivot("Electrode_WaveBand", pivot_keys)
+        .agg({"Power": "first"})
+        .fillna(0.0)
+    )
+    feature_cols = [c for c in features_df.columns if c not in ("SubjectID", "EpochID", "label")]
+    return features_df, feature_cols
 

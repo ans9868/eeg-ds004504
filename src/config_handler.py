@@ -38,6 +38,7 @@ def _interactive_config(default_config=None):
         default_config = {
             "data_path": "",
             "derivatives": True,
+            "method": "welch",
             "windowLength": 3,
             "stepSize": 1.50,
             "freqBands": {
@@ -89,7 +90,19 @@ def _interactive_config(default_config=None):
                     except ValueError:
                         print("⚠️  Please enter valid numbers for frequencies.")
                 config[key] = custom_bands if custom_bands else default
-
+        # special case for welch / multitaper 
+        elif key == "method":
+            valid_methods = ["welch", "multitaper"]
+            while True:
+                user_input = input(f"{key} [{default}] (welch or multitaper): ").strip().lower()
+                if not user_input and default:
+                    config["method"] = default.lower()
+                    break
+                elif user_input in valid_methods:
+                    config["method"] = user_input
+                    break
+                else:
+                    print("❗ ERROR: Method must be either 'welch' or 'multitaper'. Please try again.")
         # Everything else (derivatives, windowLength, stepSize)
         else:
             while True:

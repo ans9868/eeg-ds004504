@@ -5,14 +5,43 @@ import mne
 import os
 import time
 from joblib import Parallel, delayed 
-from preprocess_sets import processSub, participantsInfoPath
+from pyspark.sql import Row
+from mne_features.univariate import (
+    compute_app_entropy,
+    compute_samp_entropy,
+    compute_higuchi_fd,
+    compute_katz_fd,
+    compute_hjorth_mobility,
+    compute_hjorth_complexity,
+    compute_rms,
+    compute_skewness,
+    compute_kurtosis,
+    compute_std,
+    compute_mean
+)
+try:
+    # When run as part of a package (local scripts, Jupyter, etc.)
+    from src.config_handler import load_config, initiate_config
+    from src.preprocess_sets import processSub, participantsInfoPath
+except ImportError:
+    # When run inside Spark workers (which get flat files via sc.addPyFile)
+    from preprocess_sets import processSub, participantsInfoPath
+    from config_handler import load_config, initiate_config
 
-freqBands = {
-    "Delta": (0.5, 4),
-    "Theta": (4, 8),
-    "Alpha": (8, 12),
-    "Beta": (12, 30),
-}
+
+try:
+    config = load_config()
+except RuntimeError:
+    print("Config not found in feature_extraction.py")
+    config = initiate_config()
+
+
+config = load_config()
+freqBands = config['freqBands']
+windowLength = config['windowLength']
+stepSize = config['stepSize']
+method = config['method']
+print(f"Config using in feature Extraction.py {config}")
 
 def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
    # Select the channel's PSD and the frequencies in the range
@@ -24,73 +53,108 @@ def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
     return band_power
 
 
+# check, this might just be all zeros after normliziatoin 
 def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mean across all frequencies to be consistent
     total_power = normalPsd[channel_idx, :].mean()
     
     return total_power
 
-def processEpoch(epoch, freqBands=freqBands, method='welch', windowLength=3, stepSize=1.5, n_jobs=1):
-    """
-    Process an epoch to extract band power features for each channel and frequency band.
-    
-    Parameters:
-    -----------
-    epoch : mne.Epochs
-        The EEG epoch to process.
-    freqBands : dict
-        Dictionary with band names as keys and (fmin, fmax) tuples as values.
-    method : str, optional
-        Method to compute PSD ('welch' or 'multitaper').
-    windowLength : float, optional
-        Length of the window for PSD calculation.
-    stepSize : float, optional
-        Step size for the window.
-    n_jobs : int, optional
-        Number of jobs to run in parallel.
-        
-    Returns:
-    --------
-    list
-        List of tuples: ((channel_name, band_name), feature_value)
-    """
-    # Determine the overall frequency range
+def totalEnergy(normalPsd, freqs, channel_idx=0):
+    '''
+    Compute the total energy of the EEG signal for a specific channel.
+    Total energy is defined as the sum of the squared amplitude over time.     
+    '''
+   
+    channel_signal = normalPsd[channel_idx, :]
+    energy = np.sum(np.square(channel_signal))
+    return energy
+
+def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
+    rows.append(Row(
+        SubjectID=subjectID,
+        EpochID=epochID,
+        Electrode=None,
+        WaveBand=None,
+        FeatureName=feature_name,
+        FeatureValue=float(value),
+        table_type="epoch"
+    ))
+
+
+def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     fmin = min(band_range[0] for band_range in freqBands.values())
     fmax = max(band_range[1] for band_range in freqBands.values())
     
-    # Get channel names
     channelNames = epoch.info['ch_names']
     
-    # Compute PSD
     psds, freqs = epoch.compute_psd(
-        method=method, 
-        picks='eeg', 
-        fmin=fmin, 
-        fmax=fmax, 
+        method=method,
+        picks='eeg',
+        fmin=fmin,
+        fmax=fmax,
         verbose=False
     ).get_data(return_freqs=True)
     
-    # Normalize the PSDs (per channel)
-    # This makes sure each channel's PSD sums to 1
     normalPsds = psds / np.sum(psds, axis=-1, keepdims=True)
-    normalPsds = np.squeeze(normalPsds) 
+    normalPsds = np.squeeze(normalPsds)
 
-    # Extract features
-    features = []
+    rows = []
     
-    # Process each channel
     for channel_idx, channel_name in enumerate(channelNames):
-        # Calculate each frequency band power
         for band_name, (band_fmin, band_fmax) in freqBands.items():
             band_power = bandPower(normalPsds, freqs, band_fmin, band_fmax, channel_idx)
-            features.append(((channel_name, band_name), [band_power])) #will add other stuff next to band power here so that it is iterable
-        
-            #MAKE IT SO THAT ITERABLE AND EACH CHANNEL NAME / DATAPOINT IS ITERABLE FOR SAME CHANNEL NAME BAND NAME AND BAND POWER !!
-        # Calculate total band power
-        total_power = totalBandPower(normalPsds, freqs, channel_idx)
-        features.append(((channel_name, 'Total'), [total_power])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
-    
-    return features
+            rows.append(Row(
+                SubjectID=subjectID,
+                EpochID=epochID,
+                Electrode=channel_name,
+                WaveBand=band_name,
+                FeatureName="Power",
+                FeatureValue=band_power,
+                table_type="band"
+            ))
 
+        rows.append(Row(
+            SubjectID=subjectID,
+            EpochID=epochID,
+            Electrode=channel_name,
+            WaveBand=None,
+            FeatureName="TotalEnergy",
+            FeatureValue=totalEnergy(normalPsds, freqs, channel_idx),
+            table_type="electrode"
+        ))
+
+        rows.append(Row(
+            SubjectID=subjectID,
+            EpochID=epochID,
+            Electrode=channel_name,
+            WaveBand=None,
+            FeatureName="TotalPower",
+            FeatureValue=totalBandPower(normalPsds, freqs, channel_idx),
+            table_type="electrode"
+        ))
+
+    # ----- Epoch-level features via mne-features -----
+    data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
+
+    # univariate features - averaged aross channels
+    add_epoch_feature(rows, subjectID, epochID, "Mean", np.mean(compute_mean(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Std", np.mean(compute_std(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Variance", np.mean(compute_std(data) ** 2))
+    add_epoch_feature(rows, subjectID, epochID, "Skewness", np.mean(compute_skewness(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Kurtosis", np.mean(compute_kurtosis(data)))
+    add_epoch_feature(rows, subjectID, epochID, "RMS", np.mean(compute_rms(data)))
+    
+    # Hjorth parameters
+    add_epoch_feature(rows, subjectID, epochID, "HjorthMobility", np.mean(compute_hjorth_mobility(data)))
+    add_epoch_feature(rows, subjectID, epochID, "HjorthComplexity", np.mean(compute_hjorth_complexity(data)))
+
+    # Entropy + nonlinear
+    add_epoch_feature(rows, subjectID, epochID, "AppEntropy", np.mean(compute_app_entropy(data)))
+    add_epoch_feature(rows, subjectID, epochID, "SampleEntropy", np.mean(compute_samp_entropy(data)))
+    add_epoch_feature(rows, subjectID, epochID, "HiguchiFD", np.mean(compute_higuchi_fd(data)))
+    add_epoch_feature(rows, subjectID, epochID, "KatzFD", np.mean(compute_katz_fd(data)))
+
+    return rows
 
 
 '''
@@ -100,7 +164,7 @@ def processSubject(subject, n_jobs=-1, freqBands=freqBands):
     start = time.time()    
 
     epochs = processSub(subject)
-    epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method='welch') for x in range(len(epochs)))
+    epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method=method) for x in range(len(epochs)))
     # processedEpoch = processEpoch(epochs[0], freqBands)
    
     print(f"processSubject {subject}:", time.time()-start)
@@ -119,11 +183,8 @@ def processSubjects(subjectList, n_jobs=-1):
     return allResults
 
 
-
-
-
 if __name__ == '__main__':
-
+    initiate_config()
     participantsInfo = pd.read_table(participantsInfoPath())
     A_sub = participantsInfo[participantsInfo["Group"] == "A"]["participant_id"].tolist()
 
