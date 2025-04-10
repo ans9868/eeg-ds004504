@@ -6,6 +6,7 @@ import os
 import time
 from joblib import Parallel, delayed 
 from pyspark.sql import Row
+from mne_features.univariate import compute_app_entropy, compute_samp_entropy
 
 
 try:
@@ -124,15 +125,50 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
    
     # TODO: you are here Adel *!* ask gpt if looks good and find an epoch level feature to put in :) , also make sure to pass subject id epoch id and epoch
     # Epoch-level feature example (placeholder logic)
+    # rows.append(Row(
+    #     SubjectID=subjectID,
+    #     EpochID=epochID,
+    #     Electrode=None,
+    #     WaveBand=None,
+    #     FeatureName="FractalDim",
+    #     FeatureValue=0,  # Replace with actual computation
+    #     table_type="epoch"
+    # ))
+    
+    # Add inside your processEpoch function, just before the return
+    raw_epoch_data = epoch.get_data()  # shape: (n_epochs=1, n_channels, n_times)
+    X = raw_epoch_data[0]              # remove first axis wich is [ ] since only one epoch just -> shape: (n_channels, n_times)
+
+    # Compute approximate entropy per channel
+    app_entropy_vals = compute_app_entropy(X)  # returns shape (n_channels,)
+
+    # Add mean across channels as epoch-level feature
     rows.append(Row(
         SubjectID=subjectID,
         EpochID=epochID,
         Electrode=None,
         WaveBand=None,
-        FeatureName="FractalDim",
-        FeatureValue=0,  # Replace with actual computation
+        FeatureName="AppEntropyMean",
+        FeatureValue=float(app_entropy_vals.mean()),
         table_type="epoch"
     ))
+
+
+    sampe_entropy_vals = compute_samp_entropy(X)  # returns shape (n_channels,)
+
+    # Add mean across channels as epoch-level feature
+    rows.append(Row(
+        SubjectID=subjectID,
+        EpochID=epochID,
+        Electrode=None,
+        WaveBand=None,
+        FeatureName="SampEntropyMean",
+        FeatureValue=float(sampe_entropy_vals.mean()),
+        table_type="epoch"
+    ))
+
+
+
 
     return rows
 
