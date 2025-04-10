@@ -7,15 +7,16 @@ def get_subject_schema():
         StructField("Group", StringType(), False),
     ])
 
-# Features table schema
+# Features table schema !! swaped electrode and waveband!!
 def get_feature_schema():
     return StructType([
         StructField("SubjectID", StringType(), False),
         StructField("EpochID", StringType(), False),
-        StructField("WaveBand", StringType(), False),
         StructField("Electrode", StringType(), False),
-        StructField("Power", DoubleType(), True), # TODO: Change to DoubleType pro's and cons... is the rounding a big deal ? 
-        StructField("Energy", DoubleType(), True) # TODO: Change to DoubleType pro's and cons... is the rounding a big deal ? 
+        StructField("WaveBand", StringType(), False),
+        StructField("FeatureName", StringType(), True), 
+        StructField("FeatureValue", DoubleType(), True),
+        StructField("table_type", DoubleType(), True) 
         #     StructField("Skewness", FloatType(), True),
     #     StructField("Kurtosis", FloatType(), True),
     #     StructField("Variance", FloatType(), True),

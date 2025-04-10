@@ -5,6 +5,8 @@ import mne
 import os
 import time
 from joblib import Parallel, delayed 
+from pyspark.sql import Row
+
 
 try:
     # When run as part of a package (local scripts, Jupyter, etc.)
@@ -56,31 +58,8 @@ def totalEnergy(normalPsd, freqs, channel_idx=0):
     energy = np.sum(np.square(channel_signal))
     return energy
 
-
-def processEpoch(epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
-    """
-    Process an epoch to extract band power features for each channel and frequency band.
-    
-    Parameters:
-    -----------
-    epoch : mne.Epochs
-        The EEG epoch to process.
-    freqBands : dict
-        Dictionary with band names as keys and (fmin, fmax) tuples as values.
-    method : str, optional
-        Method to compute PSD (method or 'multitaper').
-    windowLength : float, optional
-        Length of the window for PSD calculation.
-    stepSize : float, optional
-        Step size for the window.
-    n_jobs : int, optional
-        Number of jobs to run in parallel.
-        
-    Returns:
-    --------
-    list
-        List of tuples: ((channel_name, band_name), feature_value)
-    """
+# TODO: use this depency here later to computer the stuff! https://mne.tools/mne-features/
+def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     # Determine the overall frequency range
     fmin = min(band_range[0] for band_range in freqBands.values())
     fmax = max(band_range[1] for band_range in freqBands.values())
@@ -103,22 +82,59 @@ def processEpoch(epoch, freqBands=freqBands, method=method, windowLength=windowL
     normalPsds = np.squeeze(normalPsds) 
 
     # Extract features
-    features = []
+    rows = []
     
     # Process each channel
     for channel_idx, channel_name in enumerate(channelNames):
         # Calculate each frequency band power
         for band_name, (band_fmin, band_fmax) in freqBands.items():
             band_power = bandPower(normalPsds, freqs, band_fmin, band_fmax, channel_idx)
-            features.append(((channel_name, band_name), [band_power])) #will add other stuff next to band power here so that it is iterable
-        
-            #MAKE IT SO THAT ITERABLE AND EACH CHANNEL NAME / DATAPOINT IS ITERABLE FOR SAME CHANNEL NAME BAND NAME AND BAND POWER !!
+            
+            rows.append(Row(
+                SubjectID=subjectID,
+                EpochID=epochID,
+                Electrode=channel_name,
+                WaveBand=band_name,
+                FeatureName="Power",
+                FeatureValue=band_power,
+                table_type="band"
+            ))
+
         # Calculate total band power
-        total_power = totalBandPower(normalPsds, freqs, channel_idx)
-        total_energy = totalEnergy(normalPsds, freqs, channel_idx)
-        features.append(((channel_name, 'Total'), [total_power, total_energy])) #is there more stuff that is 'total for the channe, if so add it to the tuble with total power!
-    
-    return features
+                    
+        rows.append(Row(
+            SubjectID=subjectID,
+            EpochID=epochID,
+            Electrode=channel_name,
+            WaveBand=None,
+            FeatureName="TotalEnergy",
+            FeatureValue=totalEnergy(normalPsds, freqs, channel_idx),
+            table_type="electrode"
+        ))
+
+        rows.append(Row(
+            SubjectID=subjectID,
+            EpochID=epochID,
+            Electrode=channel_name,
+            WaveBand=None,
+            FeatureName="TotalPower",
+            FeatureValue=totalBandPower(normalPsds, freqs, channel_idx),
+            table_type="electrode"
+        ))
+   
+    # TODO: you are here Adel *!* ask gpt if looks good and find an epoch level feature to put in :) , also make sure to pass subject id epoch id and epoch
+    # Epoch-level feature example (placeholder logic)
+    rows.append(Row(
+        SubjectID=subjectID,
+        EpochID=epochID,
+        Electrode=None,
+        WaveBand=None,
+        FeatureName="FractalDim",
+        FeatureValue=0,  # Replace with actual computation
+        table_type="epoch"
+    ))
+
+    return rows
 
 
 

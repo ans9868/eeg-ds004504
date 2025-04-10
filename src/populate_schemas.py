@@ -63,74 +63,102 @@ def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFram
     return spark.createDataFrame(records, schema=get_subject_schema())
 
 
-
-
 @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
 def extract_features_udtf(pdf):
-    import time
     from feature_extraction import processEpoch, processSub
-    from schema_definition import get_feature_schema, get_subject_schema
+    from pyspark.sql import Row
     rows = []
-    start = time.time()
+
     for _, row in pdf.iterrows():
         subject_id = row["SubjectID"]
         try:
-            print(f"Processing subject {subject_id}")
             epochs = processSub(subject_id, derivatives=False)
-            print(f"Got {len(epochs)} epochs for {subject_id}")
-            print(type(epochs)) 
-            # for i, epoch in enumerate(epochs):
             for i in range(len(epochs)):
-                epoch = epochs[i]
-                if i < 2:  # Just print info for the first 2 epochs to avoid spam
-                    # print(f"Epoch {i} shape: {epoch.to_data_frame().shape()}")
-                    print(f"Epoch {i}")
-                    print(type(epoch))
-                    print(type(epochs[i]))
-                epoch_id = f"ep-{i}"
-                features = processEpoch(epoch)
-                
-                if i < 2:  # Debug output
-                    # print(f"Epoch {i} features count: {len(features) if features else 0}")
-                    if features and len(features) > 0:
-                        pass
-                        # print(f"First feature sample: {next(iter(features))}")
-                
-                for item in features:
-                    # Check the structure of each item
-                    # print(f"item {item}")
-                    electrode_band_key, stats_value = item
-                    electrode, band = electrode_band_key
-                    # print(f"Adding: {subject_id}, {epoch_id}, {band}, {electrode}, stats: {stats_value}")
-                    
-                    # Add to results - adjust this based on actual structure 
                     try:
-                        rows.append((subject_id, epoch_id, band, electrode, *stats_value))
+                        epoch = epochs[i]
+                        epoch_id = f"ep-{i}"
+                        epoch_features = processEpoch(subject_id, epoch_id, epoch)
+                        rows.extend(epoch_features)
                     except Exception as e:
-                        print(f"Error appending row: {e}, stats_value: {stats_value}")
-            
-            print(f"Total rows collected: {len(rows)}")
-            
+                        print(f"Failed to process {subject_id}:ep-{i}: {e}")
+                        continue
         except Exception as e:
-            print(f"Error processing {subject_id}: {e}")
-            import traceback
-            traceback.print_exc()
-            
-    # Print final row count before returning
-    print(f"Returning DataFrame with {len(rows)} rows")
-    
-    # Check if we have column names from schema
-    schema_fields = get_feature_schema()
-    column_names = [f.name for f in schema_fields]
-    print(f"Column names from schema: {column_names}")
-    #error after here 
-    import pandas as pd
-    result_df = pd.DataFrame(rows, columns=column_names)
-    # print(f"Result DataFrame shape: {result_df.shape}")
-    print(time.time() - start)
-    print(rows[0])
-    print(schema_fields)
-    return result_df
+            print(f"Failed to process {subject_id}: {e}")
+            continue
+
+    return rows
+
+# @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
+# def extract_features_udtf(pdf):
+#     import time
+#     from feature_extraction import processEpoch, processSub
+#     from schema_definition import get_feature_schema, get_subject_schema
+#     rows = []
+#     start = time.time()
+#     for _, row in pdf.iterrows():
+#         subject_id = row["SubjectID"]
+#         try:
+#             print(f"Processing subject {subject_id}")
+#             epochs = processSub(subject_id, derivatives=False)
+#             print(f"Got {len(epochs)} epochs for {subject_id}")
+#             print(type(epochs)) 
+#             # for i, epoch in enumerate(epochs):
+#             for i in range(len(epochs)):
+#                 epoch = epochs[i]
+#                 if i < 2:  # Just print info for the first 2 epochs to avoid spam
+#                     # print(f"Epoch {i} shape: {epoch.to_data_frame().shape()}")
+#                     print(f"Epoch {i}")
+#                     print(type(epoch))
+#                     print(type(epochs[i]))
+#                 epoch_id = f"ep-{i}"
+#                 features = processEpoch(epoch)
+#                 
+#                 if i < 2:  # Debug output
+#                     # print(f"Epoch {i} features count: {len(features) if features else 0}")
+#                     if features and len(features) > 0:
+#                         pass
+#                         # print(f"First feature sample: {next(iter(features))}")
+#                 
+#                 for item in features:
+#                     # Check the structure of each item
+#                     # print(f"item {item}")
+#                     electrode_band_key, stats_value = item
+#                     electrode, band = electrode_band_key
+#                     # print(f"Adding: {subject_id}, {epoch_id}, {band}, {electrode}, stats: {stats_value}")
+#                     
+#                     # Add to results - adjust this based on actual structure 
+#                     try:
+#                         rows.append((subject_id, epoch_id, band, electrode, *stats_value))
+#                     except Exception as e:
+#                         print(f"Error appending row: {e}, stats_value: {stats_value}")
+#             
+#             print(f"Total rows collected: {len(rows)}")
+#             
+#         except Exception as e:
+#             print(f"Error processing {subject_id}: {e}")
+#             import traceback
+#             traceback.print_exc()
+#             
+#     # Print final row count before returning
+#     print(f"Returning DataFrame with {len(rows)} rows")
+#     
+#     # Check if we have column names from schema
+#     schema_fields = get_feature_schema()
+#     column_names = [f.name for f in schema_fields]
+#     print(f"Column names from schema: {column_names}")
+#     
+#     """
+#     need to make it so that we return multiple dataframes 
+#     and maybe call several process epochs iono but we need multiple tables so probably another udtf as well
+#
+#     """
+#     import pandas as pd
+#     result_df = pd.DataFrame(rows, columns=column_names)
+#     # print(f"Result DataFrame shape: {result_df.shape}")
+#     print(time.time() - start)
+#     print(rows[0])
+#     print(schema_fields)
+#     return result_df
 
 
 if __name__ == "__main__":
