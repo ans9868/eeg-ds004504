@@ -6,9 +6,20 @@ import os
 import time
 from joblib import Parallel, delayed 
 from pyspark.sql import Row
-from mne_features.univariate import compute_app_entropy, compute_samp_entropy
 
-
+from mne_features.univariate import (
+    compute_app_entropy,
+    compute_samp_entropy,
+    compute_higuchi_fd,
+    compute_katz_fd,
+    compute_hjorth_mobility,
+    compute_hjorth_complexity,
+    compute_rms,
+    compute_skewness,
+    compute_kurtosis,
+    compute_std,
+    compute_mean
+)
 try:
     # When run as part of a package (local scripts, Jupyter, etc.)
     from src.config_handler import load_config, initiate_config
