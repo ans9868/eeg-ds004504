@@ -85,8 +85,11 @@ def extract_features_udtf(pdf):
         except Exception as e:
             print(f"Failed to process {subject_id}: {e}")
             continue
+    # print("FINISHED !!!")
+    # print(f"Rows{rows[0:3]}")
+    return pd.DataFrame([r.asDict() for r in rows]) # possible bottlenesck issue # performance review, can instead use end of previous function , but this is 'safer'
 
-    return rows
+
 
 # @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
 # def extract_features_udtf(pdf):
