@@ -556,3 +556,98 @@ features created
 ['C3_Alpha_Power', 'C3_Beta_Power', 'C3_Delta_Power', 'C3_Theta_Power', 'C3_TotalEnergy', 'C3_TotalPower', 'C4_Alpha_Power', 'C4_Beta_Power', 'C4_Delta_Power', 'C4_Theta_Power', 'C4_TotalEnergy', 'C4_TotalPower', 'Cz_Alpha_Power', 'Cz_Beta_Power', 'Cz_Delta_Power', 'Cz_Theta_Power', 'Cz_TotalEnergy', 'Cz_TotalPower', 'F3_Alpha_Power', 'F3_Beta_Power', 'F3_Delta_Power', 'F3_Theta_Power', 'F3_TotalEnergy', 'F3_TotalPower', 'F4_Alpha_Power', 'F4_Beta_Power', 'F4_Delta_Power', 'F4_Theta_Power', 'F4_TotalEnergy', 'F4_TotalPower', 'F7_Alpha_Power', 'F7_Beta_Power', 'F7_Delta_Power', 'F7_Theta_Power', 'F7_TotalEnergy', 'F7_TotalPower', 'F8_Alpha_Power', 'F8_Beta_Power', 'F8_Delta_Power', 'F8_Theta_Power', 'F8_TotalEnergy', 'F8_TotalPower', 'Fp1_Alpha_Power', 'Fp1_Beta_Power', 'Fp1_Delta_Power', 'Fp1_Theta_Power', 'Fp1_TotalEnergy', 'Fp1_TotalPower', 'Fp2_Alpha_Power', 'Fp2_Beta_Power', 'Fp2_Delta_Power', 'Fp2_Theta_Power', 'Fp2_TotalEnergy', 'Fp2_TotalPower', 'FractalDim', 'Fz_Alpha_Power', 'Fz_Beta_Power', 'Fz_Delta_Power', 'Fz_Theta_Power', 'Fz_TotalEnergy', 'Fz_TotalPower', 'O1_Alpha_Power', 'O1_Beta_Power', 'O1_Delta_Power', 'O1_Theta_Power', 'O1_TotalEnergy', 'O1_TotalPower', 'O2_Alpha_Power', 'O2_Beta_Power', 'O2_Delta_Power', 'O2_Theta_Power', 'O2_TotalEnergy', 'O2_TotalPower', 'P3_Alpha_Power', 'P3_Beta_Power', 'P3_Delta_Power', 'P3_Theta_Power', 'P3_TotalEnergy', 'P3_TotalPower', 'P4_Alpha_Power', 'P4_Beta_Power', 'P4_Delta_Power', 'P4_Theta_Power', 'P4_TotalEnergy', 'P4_TotalPower', 'Pz_Alpha_Power', 'Pz_Beta_Power', 'Pz_Delta_Power', 'Pz_Theta_Power', 'Pz_TotalEnergy', 'Pz_TotalPower', 'T3_Alpha_Power', 'T3_Beta_Power', 'T3_Delta_Power', 'T3_Theta_Power', 'T3_TotalEnergy', 'T3_TotalPower', 'T4_Alpha_Power', 'T4_Beta_Power', 'T4_Delta_Power', 'T4_Theta_Power', 'T4_TotalEnergy', 'T4_TotalPower', 'T5_Alpha_Power', 'T5_Beta_Power', 'T5_Delta_Power', 'T5_Theta_Power', 'T5_TotalEnergy', 'T5_TotalPower', 'T6_Alpha_Power', 'T6_Beta_Power', 'T6_Delta_Power', 'T6_Theta_Power', 'T6_TotalEnergy', 'T6_TotalPower']
 
 Current date and time: 2025-04-10 09:25:40.021804
+
+
+=== MODEL PERFORMANCE SUMMARY ===
+
+Model: Neural Network
+  AUC:      0.7136
+  Accuracy: 0.6765
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.72      0.67      0.69      1112
+ Alzheimer's       0.63      0.69      0.66       925
+
+    accuracy                           0.68      2037
+   macro avg       0.68      0.68      0.68      2037
+weighted avg       0.68      0.68      0.68      2037
+
+
+Model: Gradient Boosted Trees
+  AUC:      0.7215
+  Accuracy: 0.6603
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.74      0.58      0.65      1112
+ Alzheimer's       0.60      0.75      0.67       925
+
+    accuracy                           0.66      2037
+   macro avg       0.67      0.67      0.66      2037
+weighted avg       0.68      0.66      0.66      2037
+
+
+Model: Decision Tree
+  AUC:      0.6014
+  Accuracy: 0.5876
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.68      0.46      0.55      1112
+ Alzheimer's       0.53      0.74      0.62       925
+
+    accuracy                           0.59      2037
+   macro avg       0.61      0.60      0.58      2037
+weighted avg       0.61      0.59      0.58      2037
+
+
+Model: SVM
+  AUC:      0.6729
+  Accuracy: 0.5641
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.74      0.31      0.44      1112
+ Alzheimer's       0.51      0.86      0.64       925
+
+    accuracy                           0.56      2037
+   macro avg       0.62      0.59      0.54      2037
+weighted avg       0.63      0.56      0.53      2037
+
+
+Model: Approximate KNN
+  AUC:      N/A
+  Accuracy: 0.5881
+
+  Classification Report:
+              precision    recall  f1-score   support
+
+     Control       0.63      0.61      0.62      1112
+ Alzheimer's       0.55      0.56      0.55       925
+
+    accuracy                           0.59      2037
+   macro avg       0.59      0.59      0.59      2037
+weighted avg       0.59      0.59      0.59      2037
+
+
+
+=== ACTIVE CONFIGURATION ===
+{'data_path': '/Users/admin/eeg-ds004504',
+ 'derivatives': False,
+ 'freqBands': {'Alpha': [8, 12],
+               'Beta': [12, 30],
+               'Delta': [0.5, 4],
+               'Theta': [4, 8]},
+ 'method': 'welch',
+ 'stepSize': 1.5,
+ 'windowLength': 3}
+
+features created
+['AppEntropyMean', 'C3_Alpha_Power', 'C3_Beta_Power', 'C3_Delta_Power', 'C3_Theta_Power', 'C3_TotalEnergy', 'C3_TotalPower', 'C4_Alpha_Power', 'C4_Beta_Power', 'C4_Delta_Power', 'C4_Theta_Power', 'C4_TotalEnergy', 'C4_TotalPower', 'Cz_Alpha_Power', 'Cz_Beta_Power', 'Cz_Delta_Power', 'Cz_Theta_Power', 'Cz_TotalEnergy', 'Cz_TotalPower', 'F3_Alpha_Power', 'F3_Beta_Power', 'F3_Delta_Power', 'F3_Theta_Power', 'F3_TotalEnergy', 'F3_TotalPower', 'F4_Alpha_Power', 'F4_Beta_Power', 'F4_Delta_Power', 'F4_Theta_Power', 'F4_TotalEnergy', 'F4_TotalPower', 'F7_Alpha_Power', 'F7_Beta_Power', 'F7_Delta_Power', 'F7_Theta_Power', 'F7_TotalEnergy', 'F7_TotalPower', 'F8_Alpha_Power', 'F8_Beta_Power', 'F8_Delta_Power', 'F8_Theta_Power', 'F8_TotalEnergy', 'F8_TotalPower', 'Fp1_Alpha_Power', 'Fp1_Beta_Power', 'Fp1_Delta_Power', 'Fp1_Theta_Power', 'Fp1_TotalEnergy', 'Fp1_TotalPower', 'Fp2_Alpha_Power', 'Fp2_Beta_Power', 'Fp2_Delta_Power', 'Fp2_Theta_Power', 'Fp2_TotalEnergy', 'Fp2_TotalPower', 'Fz_Alpha_Power', 'Fz_Beta_Power', 'Fz_Delta_Power', 'Fz_Theta_Power', 'Fz_TotalEnergy', 'Fz_TotalPower', 'O1_Alpha_Power', 'O1_Beta_Power', 'O1_Delta_Power', 'O1_Theta_Power', 'O1_TotalEnergy', 'O1_TotalPower', 'O2_Alpha_Power', 'O2_Beta_Power', 'O2_Delta_Power', 'O2_Theta_Power', 'O2_TotalEnergy', 'O2_TotalPower', 'P3_Alpha_Power', 'P3_Beta_Power', 'P3_Delta_Power', 'P3_Theta_Power', 'P3_TotalEnergy', 'P3_TotalPower', 'P4_Alpha_Power', 'P4_Beta_Power', 'P4_Delta_Power', 'P4_Theta_Power', 'P4_TotalEnergy', 'P4_TotalPower', 'Pz_Alpha_Power', 'Pz_Beta_Power', 'Pz_Delta_Power', 'Pz_Theta_Power', 'Pz_TotalEnergy', 'Pz_TotalPower', 'SampEntropyMean', 'T3_Alpha_Power', 'T3_Beta_Power', 'T3_Delta_Power', 'T3_Theta_Power', 'T3_TotalEnergy', 'T3_TotalPower', 'T4_Alpha_Power', 'T4_Beta_Power', 'T4_Delta_Power', 'T4_Theta_Power', 'T4_TotalEnergy', 'T4_TotalPower', 'T5_Alpha_Power', 'T5_Beta_Power', 'T5_Delta_Power', 'T5_Theta_Power', 'T5_TotalEnergy', 'T5_TotalPower', 'T6_Alpha_Power', 'T6_Beta_Power', 'T6_Delta_Power', 'T6_Theta_Power', 'T6_TotalEnergy', 'T6_TotalPower']
+
+Current date and time: 2025-04-10 10:55:44.341525
