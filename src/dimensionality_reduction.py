@@ -7,6 +7,34 @@ from pyspark.sql.types import IntegerType
 # TODO: make config for variance target 
 
 
+from pyspark.sql.functions import col, min as _min, max as _max, broadcast, when
+
+def min_max_normalize(train_df, test_df, feature_cols, target_min=-1.0, target_max=1.0):
+    # 1. Compute min and max for each feature on the training set only
+    stats_exprs = [
+        _min(c).alias(f"{c}_min") for c in feature_cols
+    ] + [
+        _max(c).alias(f"{c}_max") for c in feature_cols
+    ]
+    stats = train_df.agg(*stats_exprs).collect()[0]
+    
+    # 2. Normalize both train and test using train stats
+    def apply_minmax(df):
+        for c in feature_cols:
+            col_min = float(stats[f"{c}_min"])
+            col_max = float(stats[f"{c}_max"])
+            range_val = col_max - col_min if col_max != col_min else 1.0  # avoid div by 0
+
+            df = df.withColumn(
+                c,
+                ((col(c) - col_min) / range_val) * (target_max - target_min) + target_min
+            )
+        return df
+
+    return apply_minmax(train_df), apply_minmax(test_df)
+
+
+
 def normalize_by_column(train_df, test_df, feature_cols):
     from pyspark.sql.functions import col, mean as _mean, stddev as _stddev, broadcast, when, first
     from pyspark.sql.types import FloatType

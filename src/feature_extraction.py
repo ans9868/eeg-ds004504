@@ -6,7 +6,6 @@ import os
 import time
 from joblib import Parallel, delayed 
 from pyspark.sql import Row
-
 from mne_features.univariate import (
     compute_app_entropy,
     compute_samp_entropy,
@@ -70,38 +69,40 @@ def totalEnergy(normalPsd, freqs, channel_idx=0):
     energy = np.sum(np.square(channel_signal))
     return energy
 
-# TODO: use this depency here later to computer the stuff! https://mne.tools/mne-features/
+def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
+    rows.append(Row(
+        SubjectID=subjectID,
+        EpochID=epochID,
+        Electrode=None,
+        WaveBand=None,
+        FeatureName=feature_name,
+        FeatureValue=float(value),
+        table_type="epoch"
+    ))
+
+
 def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
-    # Determine the overall frequency range
     fmin = min(band_range[0] for band_range in freqBands.values())
     fmax = max(band_range[1] for band_range in freqBands.values())
     
-    # Get channel names
     channelNames = epoch.info['ch_names']
     
-    # Compute PSD
     psds, freqs = epoch.compute_psd(
-        method=method, 
-        picks='eeg', 
-        fmin=fmin, 
-        fmax=fmax, 
+        method=method,
+        picks='eeg',
+        fmin=fmin,
+        fmax=fmax,
         verbose=False
     ).get_data(return_freqs=True)
     
-    # Normalize the PSDs (per channel)
-    # This makes sure each channel's PSD sums to 1
     normalPsds = psds / np.sum(psds, axis=-1, keepdims=True)
-    normalPsds = np.squeeze(normalPsds) 
+    normalPsds = np.squeeze(normalPsds)
 
-    # Extract features
     rows = []
     
-    # Process each channel
     for channel_idx, channel_name in enumerate(channelNames):
-        # Calculate each frequency band power
         for band_name, (band_fmin, band_fmax) in freqBands.items():
             band_power = bandPower(normalPsds, freqs, band_fmin, band_fmax, channel_idx)
-            
             rows.append(Row(
                 SubjectID=subjectID,
                 EpochID=epochID,
@@ -112,8 +113,6 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
                 table_type="band"
             ))
 
-        # Calculate total band power
-                    
         rows.append(Row(
             SubjectID=subjectID,
             EpochID=epochID,
@@ -133,56 +132,29 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             FeatureValue=totalBandPower(normalPsds, freqs, channel_idx),
             table_type="electrode"
         ))
-   
-    # TODO: you are here Adel *!* ask gpt if looks good and find an epoch level feature to put in :) , also make sure to pass subject id epoch id and epoch
-    # Epoch-level feature example (placeholder logic)
-    # rows.append(Row(
-    #     SubjectID=subjectID,
-    #     EpochID=epochID,
-    #     Electrode=None,
-    #     WaveBand=None,
-    #     FeatureName="FractalDim",
-    #     FeatureValue=0,  # Replace with actual computation
-    #     table_type="epoch"
-    # ))
+
+    # ----- Epoch-level features via mne-features -----
+    data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
+
+    # univariate features - averaged aross channels
+    add_epoch_feature(rows, subjectID, epochID, "Mean", np.mean(compute_mean(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Std", np.mean(compute_std(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Variance", np.mean(compute_std(data) ** 2))
+    add_epoch_feature(rows, subjectID, epochID, "Skewness", np.mean(compute_skewness(data)))
+    add_epoch_feature(rows, subjectID, epochID, "Kurtosis", np.mean(compute_kurtosis(data)))
+    add_epoch_feature(rows, subjectID, epochID, "RMS", np.mean(compute_rms(data)))
     
-    # Add inside your processEpoch function, just before the return
-    raw_epoch_data = epoch.get_data()  # shape: (n_epochs=1, n_channels, n_times)
-    X = raw_epoch_data[0]              # remove first axis wich is [ ] since only one epoch just -> shape: (n_channels, n_times)
+    # Hjorth parameters
+    add_epoch_feature(rows, subjectID, epochID, "HjorthMobility", np.mean(compute_hjorth_mobility(data)))
+    add_epoch_feature(rows, subjectID, epochID, "HjorthComplexity", np.mean(compute_hjorth_complexity(data)))
 
-    # Compute approximate entropy per channel
-    app_entropy_vals = compute_app_entropy(X)  # returns shape (n_channels,)
-
-    # Add mean across channels as epoch-level feature
-    rows.append(Row(
-        SubjectID=subjectID,
-        EpochID=epochID,
-        Electrode=None,
-        WaveBand=None,
-        FeatureName="AppEntropyMean",
-        FeatureValue=float(app_entropy_vals.mean()),
-        table_type="epoch"
-    ))
-
-
-    sampe_entropy_vals = compute_samp_entropy(X)  # returns shape (n_channels,)
-
-    # Add mean across channels as epoch-level feature
-    rows.append(Row(
-        SubjectID=subjectID,
-        EpochID=epochID,
-        Electrode=None,
-        WaveBand=None,
-        FeatureName="SampEntropyMean",
-        FeatureValue=float(sampe_entropy_vals.mean()),
-        table_type="epoch"
-    ))
-
-
-
+    # Entropy + nonlinear
+    add_epoch_feature(rows, subjectID, epochID, "AppEntropy", np.mean(compute_app_entropy(data)))
+    add_epoch_feature(rows, subjectID, epochID, "SampleEntropy", np.mean(compute_samp_entropy(data)))
+    add_epoch_feature(rows, subjectID, epochID, "HiguchiFD", np.mean(compute_higuchi_fd(data)))
+    add_epoch_feature(rows, subjectID, epochID, "KatzFD", np.mean(compute_katz_fd(data)))
 
     return rows
-
 
 
 '''
