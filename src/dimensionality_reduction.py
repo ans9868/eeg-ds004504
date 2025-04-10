@@ -7,6 +7,85 @@ from pyspark.sql.types import IntegerType
 # TODO: make config for variance target 
 
 
+def normalize_by_column(train_df, test_df, feature_cols):
+    from pyspark.sql.functions import col, mean as _mean, stddev as _stddev, broadcast, when, first
+    from pyspark.sql.types import FloatType
+
+    # Cast all feature columns to float
+    for col_name in feature_cols:
+        train_df = train_df.withColumn(col_name, col(col_name).cast(FloatType()))
+        test_df = test_df.withColumn(col_name, col(col_name).cast(FloatType()))
+
+    # Melt train df into long format
+    train_long = train_df.select("SubjectID", "EpochID", "label", *feature_cols) \
+        .selectExpr("SubjectID", "EpochID", "label", "stack({0}, {1}) as (pivot, value)".format(
+            len(feature_cols),
+            ', '.join([f"'{c}', `{c}`" for c in feature_cols])
+        ))
+
+    # Compute normalization stats
+    stats = train_long.groupBy("pivot").agg(
+        _mean("value").alias("mean_val"),
+        _stddev("value").alias("std_val")
+    )
+
+    # Normalize and pivot back (can be slow for large data)
+    def apply_normalization(df):
+        long_df = df.select("SubjectID", "EpochID", "label", *feature_cols) \
+            .selectExpr("SubjectID", "EpochID", "label", "stack({0}, {1}) as (pivot, value)".format(
+                len(feature_cols),
+                ', '.join([f"'{c}', `{c}`" for c in feature_cols])
+            ))
+        long_df = long_df.join(broadcast(stats), on="pivot")
+        long_df = long_df.withColumn(
+            "norm_value",
+            (col("value") - col("mean_val")) / when((col("std_val").isNotNull()) & (col("std_val") != 0), col("std_val")).otherwise(1.0)
+        )
+        return long_df.groupBy("SubjectID", "EpochID", "label").pivot("pivot").agg(first("norm_value")).fillna(0.0)
+
+    return apply_normalization(train_df), apply_normalization(test_df)
+
+def fit_pca_model(target_df, feature_cols, variance_target=0.95):
+    from pyspark.ml.feature import PCA, VectorAssembler
+    import numpy as np
+
+    assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
+    assembled_train = assembler.transform(target_df)
+
+    k_max = len(feature_cols)
+    model_full = PCA(k=k_max, inputCol="features", outputCol="pca_features").fit(assembled_train)
+    explained = model_full.explainedVariance.toArray()
+    k_95 = next(i for i, x in enumerate(np.cumsum(explained)) if x >= variance_target) + 1
+
+    pca_model = PCA(k=k_95, inputCol="features", outputCol="pca_features").fit(assembled_train)
+    return pca_model, k_95
+
+
+from pyspark.ml.feature import VectorAssembler
+from pyspark.ml.functions import vector_to_array
+from pyspark.sql.functions import col
+from pyspark.sql.types import IntegerType
+
+def apply_pca_model(target_df, pca_cols, pca_model, k):
+    # Step 1: Assemble original features (before PCA) into a vector
+    assembler = VectorAssembler(inputCols=pca_cols, outputCol="features")
+    assembled_df = assembler.transform(target_df)
+
+    # Step 2: Apply the PCA model
+    transformed = pca_model.transform(assembled_df)
+
+    # Step 3: Extract just the PCA output vector and label
+    # Ensure label is IntegerType
+    final_df = transformed.select(
+        col("pca_features").alias("features"),
+        col("label").cast(IntegerType()).alias("label")
+    )
+
+    return final_df
+
+
+# ********************************* !! DEPRECATED !! ***********************************************
+
 # this z-scores all the data between 2 datasets - tested works 
 def normalize_power(train_spark_df, test_spark_df):
     from pyspark.sql.functions import mean as _mean, stddev as _stddev, broadcast, when
@@ -51,44 +130,4 @@ def prepare_features_for_pca(df):
     )
     feature_cols = [c for c in features_df.columns if c not in ("SubjectID", "EpochID", "label")]
     return features_df, feature_cols
-
-def fit_pca_model(target_df, feature_cols, variance_target=0.95):
-    from pyspark.ml.feature import PCA, VectorAssembler
-    import numpy as np
-
-    assembler = VectorAssembler(inputCols=feature_cols, outputCol="features")
-    assembled_train = assembler.transform(target_df)
-
-    k_max = len(feature_cols)
-    model_full = PCA(k=k_max, inputCol="features", outputCol="pca_features").fit(assembled_train)
-    explained = model_full.explainedVariance.toArray()
-    k_95 = next(i for i, x in enumerate(np.cumsum(explained)) if x >= variance_target) + 1
-
-    pca_model = PCA(k=k_95, inputCol="features", outputCol="pca_features").fit(assembled_train)
-    return pca_model, k_95
-
-
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.functions import vector_to_array
-from pyspark.sql.functions import col
-from pyspark.sql.types import IntegerType
-
-def apply_pca_model(target_df, pca_cols, pca_model, k):
-    # Step 1: Assemble original features (before PCA) into a vector
-    assembler = VectorAssembler(inputCols=pca_cols, outputCol="features")
-    assembled_df = assembler.transform(target_df)
-
-    # Step 2: Apply the PCA model
-    transformed = pca_model.transform(assembled_df)
-
-    # Step 3: Extract just the PCA output vector and label
-    # Ensure label is IntegerType
-    final_df = transformed.select(
-        col("pca_features").alias("features"),
-        col("label").cast(IntegerType()).alias("label")
-    )
-
-    return final_df
-
-
 
