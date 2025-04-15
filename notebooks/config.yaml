@@ -13,6 +13,9 @@ freqBands:
   Theta:
     - 4
     - 8
+  custom1:
+    - 9
+    - 11
 method: welch
 stepSize: 1.5
 windowLength: 3
