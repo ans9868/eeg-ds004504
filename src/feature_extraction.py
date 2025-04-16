@@ -81,6 +81,8 @@ def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
     ))
 
 
+# TODO : more feature extractoin per electrode per band  , be smark about what choose , and make it so that do it efficiently / no repeats 
+# At least make it so taht we expand the electrode level features, then maybe are able to do the band level features depending on time factor 
 def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     fmin = min(band_range[0] for band_range in freqBands.values())
     fmax = max(band_range[1] for band_range in freqBands.values())
