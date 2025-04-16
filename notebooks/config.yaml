@@ -17,5 +17,5 @@ freqBands:
     - 9
     - 11
 method: welch
-stepSize: 1.5
+stepSize: 0.3
 windowLength: 3
