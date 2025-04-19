@@ -1,5 +1,5 @@
 data_path: /Users/admin/eeg-ds004504
-derivatives: false
+derivatives: true
 freqBands:
   Alpha:
     - 8
