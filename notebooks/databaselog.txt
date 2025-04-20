@@ -1,0 +1,34 @@
+=== DATABASE LOG ENTRY: Apr19_2141 ===
+Saved file: features_alz_extra_features_Apr19_2141.pkl
+Unique subjects: -1
+
+Configuration:
+  data_path: /Users/admin/eeg-ds004504
+  derivatives: True
+  freqBands:
+    Alpha: [8, 12]
+    Beta: [12, 30]
+    Delta: [0.5, 4]
+    Theta: [4, 8]
+    custom1: [9, 11]
+  method: welch
+  stepSize: 0.3
+  windowLength: 3
+
+=== DATABASE LOG ENTRY: Apr19_2141 ===
+Saved file: features_cntrl_extra_features_Apr19_2141.pkl
+Unique subjects: -1
+
+Configuration:
+  data_path: /Users/admin/eeg-ds004504
+  derivatives: True
+  freqBands:
+    Alpha: [8, 12]
+    Beta: [12, 30]
+    Delta: [0.5, 4]
+    Theta: [4, 8]
+    custom1: [9, 11]
+  method: welch
+  stepSize: 0.3
+  windowLength: 3
+
