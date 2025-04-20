@@ -36,6 +36,12 @@ try:
     config = load_config()
 except RuntimeError:
     config = initiate_config()
+    # data_path = config['data_path']
+    # derivatives = config['derivatives']
+    # freqBands = config['freqBands']
+    # windowLength = config['windowLength']
+    # stepSize = config['stepSize']
+    # method = config['stepSize']
 
 
 def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFrame:
@@ -68,11 +74,12 @@ def extract_features_udtf(pdf):
     from feature_extraction import processEpoch, processSub
     from pyspark.sql import Row
     rows = []
+    # derivatives = config['derivatives']
 
     for _, row in pdf.iterrows():
         subject_id = row["SubjectID"]
         try:
-            epochs = processSub(subject_id, derivatives=False)
+            epochs = processSub(subject_id, config['derivatives'])
             for i in range(len(epochs)):
                     try:
                         epoch = epochs[i]

@@ -101,6 +101,7 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
     normalPsds = np.squeeze(normalPsds)
 
     rows = []
+    data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
     
     for channel_idx, channel_name in enumerate(channelNames):
         for band_name, (band_fmin, band_fmax) in freqBands.items():
@@ -134,6 +135,9 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             FeatureValue=totalBandPower(normalPsds, freqs, channel_idx),
             table_type="electrode"
         ))
+
+
+
 
     # ----- Epoch-level features via mne-features -----
     data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)

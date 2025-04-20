@@ -40,7 +40,9 @@ def subPath(sub, derivatives=True):
     
     # Strip 'sub-' prefix if it exists
     sub_id = sub.replace('sub-', '') if isinstance(sub, str) and sub.startswith('sub-') else sub
-    
+    print(f"Derivatives: {derivatives}") 
+    print(f"Derivatives from config: {config['derivatives']}") 
+
     if derivatives:
        path = os.path.join(data_path, 'ds004504', 'derivatives', f'sub-{sub_id}', 'eeg', f'sub-{sub_id}_task-eyesclosed_eeg.set')
     else:
@@ -100,6 +102,9 @@ This is for processing the subject without getting the psd's. It gets all the ep
 '''
 def processSub(sub, derivatives=derivatives, windowLength=windowLength, stepSize=stepSize):
     print("processSub", sub)
+    print("processSub: derivatives", derivatives)
+    print("processSub: windowLength", windowLength)
+    print("processSub: windowLength", stepSize)
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
     sfreq = raw.info['sfreq']
 
