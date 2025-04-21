@@ -73,6 +73,64 @@ def normalize_by_column(train_df, test_df, feature_cols):
 
     return apply_normalization(train_df), apply_normalization(test_df)
 
+
+
+    # normalizes per subject for columns
+def normalize_by_column_per_subject_wide(df, feature_cols):
+    from pyspark.sql.functions import mean as _mean, stddev as _stddev, col, when
+    stats = df.groupBy("SubjectID").agg(
+        *[
+            _mean(c).alias(f"{c}_mean") for c in feature_cols
+        ] + [
+            _stddev(c).alias(f"{c}_std") for c in feature_cols
+        ]
+    )
+
+    # Join stats back to original
+    df = df.join(stats, on="SubjectID", how="left")
+
+    # Normalize each column with its respective mean and std per subject
+    for col_name in feature_cols:
+        mean_col = f"{col_name}_mean"
+        std_col = f"{col_name}_std"
+        df = df.withColumn(
+            col_name,
+            (col(col_name) - col(mean_col)) / when((col(std_col).isNotNull()) & (col(std_col) != 0), col(std_col)).otherwise(1.0)
+        )
+
+    # Drop the extra mean/std columns used just for normalization
+    return df.drop(*[f"{c}_mean" for c in feature_cols], *[f"{c}_std" for c in feature_cols])
+
+
+def min_max_by_column_per_subject_wide(df, feature_cols):
+    from pyspark.sql.functions import min as _min, max as _max, col, when
+    # Compute min and max per SubjectID and feature
+    stats = df.groupBy("SubjectID").agg(
+        *[
+            _min(c).alias(f"{c}_min") for c in feature_cols
+        ] + [
+            _max(c).alias(f"{c}_max") for c in feature_cols
+        ]
+    )
+
+    # Join the stats back to the original dataframe
+    df = df.join(stats, on="SubjectID", how="left")
+
+    # Apply min-max normalization: (x - min) / (max - min)
+    for col_name in feature_cols:
+        min_col = f"{col_name}_min"
+        max_col = f"{col_name}_max"
+        df = df.withColumn(
+            col_name,
+            (col(col_name) - col(min_col)) /
+            when((col(max_col) != col(min_col)) & col(max_col).isNotNull(), col(max_col) - col(min_col)).otherwise(1.0)
+        )
+
+    # Drop the temporary min/max columns
+    return df.drop(*[f"{c}_min" for c in feature_cols], *[f"{c}_max" for c in feature_cols])
+
+
+
 def fit_pca_model(target_df, feature_cols, variance_target=0.95):
     from pyspark.ml.feature import PCA, VectorAssembler
     import numpy as np
@@ -88,28 +146,50 @@ def fit_pca_model(target_df, feature_cols, variance_target=0.95):
     pca_model = PCA(k=k_95, inputCol="features", outputCol="pca_features").fit(assembled_train)
     return pca_model, k_95
 
-
-from pyspark.ml.feature import VectorAssembler
-from pyspark.ml.functions import vector_to_array
-from pyspark.sql.functions import col
-from pyspark.sql.types import IntegerType
-
 def apply_pca_model(target_df, pca_cols, pca_model, k):
-    # Step 1: Assemble original features (before PCA) into a vector
+ 
+    from pyspark.ml.feature import VectorAssembler
+    from pyspark.ml.functions import vector_to_array
+    from pyspark.sql.functions import col
+    from pyspark.sql.types import IntegerType
+
+
+   # Step 1: Assemble input features into a single vector
     assembler = VectorAssembler(inputCols=pca_cols, outputCol="features")
     assembled_df = assembler.transform(target_df)
 
-    # Step 2: Apply the PCA model
+    # Step 2: Apply PCA model
     transformed = pca_model.transform(assembled_df)
 
-    # Step 3: Extract just the PCA output vector and label
-    # Ensure label is IntegerType
+    # Step 3: Select PCA features along with SubjectID, EpochID, label
     final_df = transformed.select(
-        col("pca_features").alias("features"),
-        col("label").cast(IntegerType()).alias("label")
+        col("SubjectID"),
+        col("EpochID"),
+        col("label").cast(IntegerType()).alias("label"),
+        col("pca_features").alias("features")
     )
 
     return final_df
+
+
+#the function below doens't include subject and epochid in the final_df
+
+# def apply_pca_model(target_df, pca_cols, pca_model, k):
+#     # Step 1: Assemble original features (before PCA) into a vector
+#     assembler = VectorAssembler(inputCols=pca_cols, outputCol="features")
+#     assembled_df = assembler.transform(target_df)
+#
+#     # Step 2: Apply the PCA model
+#     transformed = pca_model.transform(assembled_df)
+#
+#     # Step 3: Extract just the PCA output vector and label
+#     # Ensure label is IntegerType
+#     final_df = transformed.select(
+#         col("pca_features").alias("features"),
+#         col("label").cast(IntegerType()).alias("label")
+#     )
+#
+#     return final_df
 
 
 # ********************************* !! DEPRECATED !! ***********************************************
