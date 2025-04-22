@@ -172,6 +172,47 @@ def apply_pca_model(target_df, pca_cols, pca_model, k):
     return final_df
 
 
+
+from pyspark.sql import DataFrame
+def min_max_normalize_post_pca_by_subject(df: DataFrame, feature_col="features", id_col="SubjectID"):
+    from pyspark.ml.functions import vector_to_array, array_to_vector 
+    from pyspark.sql.functions import array
+    from pyspark.sql.functions import col, min as _min, max as _max, when, broadcast
+
+   # Step 1: Convert vector to array, then explode into columns
+    df = df.withColumn("features_array", vector_to_array(col(feature_col)))
+    k = df.selectExpr("size(features_array) as size").first()["size"]
+    for i in range(k):
+        df = df.withColumn(f"PC{i}", col("features_array")[i])
+    
+    # Step 2: Compute min/max per subject per PC component
+    agg_exprs = []
+    for i in range(k):
+        agg_exprs.append(_min(f"PC{i}").alias(f"PC{i}_min"))
+        agg_exprs.append(_max(f"PC{i}").alias(f"PC{i}_max"))
+    
+    stats = df.groupBy(id_col).agg(*agg_exprs)
+
+    # Step 3: Join stats back and normalize each PC column
+    df = df.join(broadcast(stats), on=id_col, how="left")
+    for i in range(k):
+        min_col = f"PC{i}_min"
+        max_col = f"PC{i}_max"
+        df = df.withColumn(
+            f"PC{i}",
+            (col(f"PC{i}") - col(min_col)) /
+            when((col(max_col) != col(min_col)) & col(max_col).isNotNull(), col(max_col) - col(min_col)).otherwise(1.0)
+        )
+
+    # Step 4: Reassemble into feature vector
+    df = df.withColumn("features", array_to_vector(array([col(f"PC{i}") for i in range(k)])))
+
+    # Step 5: Drop temp columns
+    drop_cols = ["features_array"] + [f"PC{i}" for i in range(k)] + [f"PC{i}_min" for i in range(k)] + [f"PC{i}_max" for i in range(k)]
+    return df.drop(*drop_cols)
+
+
+
 #the function below doens't include subject and epochid in the final_df
 
 # def apply_pca_model(target_df, pca_cols, pca_model, k):

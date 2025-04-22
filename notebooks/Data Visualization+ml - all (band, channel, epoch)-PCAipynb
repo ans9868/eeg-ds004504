@@ -2,7 +2,7 @@
  "cells": [
   {
    "cell_type": "code",
-   "execution_count": 1,
+   "execution_count": 8,
    "id": "832d994c-4f65-4efd-9d54-bb982837a40e",
    "metadata": {},
    "outputs": [],
@@ -30,7 +30,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 2,
+   "execution_count": 9,
    "id": "d16335cb-0b75-42de-86b3-f38be89b8477",
    "metadata": {},
    "outputs": [
@@ -49,7 +49,7 @@
        " 'windowLength': 3}"
       ]
      },
-     "execution_count": 2,
+     "execution_count": 9,
      "metadata": {},
      "output_type": "execute_result"
     }
@@ -62,7 +62,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 3,
+   "execution_count": 10,
    "id": "f0027a5e-0969-45e9-b678-8b18a43fb3e9",
    "metadata": {},
    "outputs": [
@@ -80,7 +80,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 4,
+   "execution_count": 11,
    "id": "e10d6090-bc70-43c9-90bd-351d571bee56",
    "metadata": {},
    "outputs": [],
@@ -93,10 +93,19 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 5,
+   "execution_count": 12,
    "id": "c02717c9-d5fc-4ef5-9638-09718d8b0944",
    "metadata": {},
-   "outputs": [],
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Stopping existing Spark context...\n",
+      "Previous Spark context stopped successfully\n"
+     ]
+    }
+   ],
    "source": [
     "# Check if there's an active Spark context and stop it\n",
     "from pyspark import SparkContext\n",
@@ -108,21 +117,10 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 6,
+   "execution_count": 13,
    "id": "4623c190-0e09-437e-a99e-5c9fa13221b7",
    "metadata": {},
    "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "Picked up _JAVA_OPTIONS: -Xmx12g -Xms4g\n",
-      "Picked up _JAVA_OPTIONS: -Xmx12g -Xms4g\n",
-      "Setting default log level to \"WARN\".\n",
-      "To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).\n",
-      "25/04/21 12:31:16 WARN NativeCodeLoader: Unable to load native-hadoop library for your platform... using builtin-java classes where applicable\n"
-     ]
-    },
     {
      "name": "stdout",
      "output_type": "stream",
@@ -202,7 +200,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 7,
+   "execution_count": 14,
    "id": "06bebbe7-aaa1-4b4e-9533-3ccee331f2a2",
    "metadata": {},
    "outputs": [
@@ -210,9 +208,6 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "Config not found in feature_extraction.py\n",
-      "Config using in feature Extraction.py {'data_path': '/Users/admin/eeg-ds004504', 'derivatives': True, 'freqBands': {'Alpha': [8, 12], 'Beta': [12, 30], 'Delta': [0.5, 4], 'Theta': [4, 8], 'custom1': [9, 11]}, 'method': 'welch', 'stepSize': 0.3, 'windowLength': 3}\n",
-      "Config using in feature Extraction.py {'data_path': '/Users/admin/eeg-ds004504', 'derivatives': True, 'freqBands': {'Alpha': [8, 12], 'Beta': [12, 30], 'Delta': [0.5, 4], 'Theta': [4, 8], 'custom1': [9, 11]}, 'method': 'welch', 'stepSize': 0.3, 'windowLength': 3}\n",
       "Config using in feature Extraction.py {'data_path': '/Users/admin/eeg-ds004504', 'derivatives': True, 'freqBands': {'Alpha': [8, 12], 'Beta': [12, 30], 'Delta': [0.5, 4], 'Theta': [4, 8], 'custom1': [9, 11]}, 'method': 'welch', 'stepSize': 0.3, 'windowLength': 3}\n",
       "Added feature_extraction.py to the pyspark context\n",
       "Added preprocess_sets to the pyspark context\n",
@@ -258,7 +253,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 8,
+   "execution_count": 15,
    "id": "e3c650f0-0690-4d81-bc0e-8b96cd68c753",
    "metadata": {},
    "outputs": [],
@@ -278,7 +273,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 9,
+   "execution_count": 16,
    "id": "afdba55e-b4fd-4b18-8c97-5da354e4c403",
    "metadata": {},
    "outputs": [
@@ -286,8 +281,8 @@
      "name": "stdout",
      "output_type": "stream",
      "text": [
-      "CPU times: user 6min 42s, sys: 4.09 s, total: 6min 47s\n",
-      "Wall time: 6min 50s\n"
+      "CPU times: user 6min 47s, sys: 13.3 s, total: 7min\n",
+      "Wall time: 7min 8s\n"
      ]
     }
    ],
@@ -299,7 +294,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 10,
+   "execution_count": 17,
    "id": "42aa31d8-1d25-49c5-86f9-72bd0f359908",
    "metadata": {},
    "outputs": [],
@@ -311,7 +306,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 11,
+   "execution_count": 18,
    "id": "c1bce16f-8544-48f2-bf19-7204e049413c",
    "metadata": {},
    "outputs": [
@@ -319,8 +314,8 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "25/04/21 12:38:16 WARN TaskSetManager: Stage 0 contains a task of very large size (69323 KiB). The maximum recommended task size is 1000 KiB.\n",
-      "25/04/21 12:38:20 WARN PythonRunner: Detected deadlock while completing task 0.0 in stage 0 (TID 0): Attempting to kill Python Worker\n",
+      "25/04/21 19:08:58 WARN TaskSetManager: Stage 0 contains a task of very large size (69323 KiB). The maximum recommended task size is 1000 KiB.\n",
+      "25/04/21 19:09:03 WARN PythonRunner: Detected deadlock while completing task 0.0 in stage 0 (TID 0): Attempting to kill Python Worker\n",
       "                                                                                "
      ]
     },
@@ -403,7 +398,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 12,
+   "execution_count": 19,
    "id": "ddfdccbd-8ab4-411b-adee-2dcbc442d439",
    "metadata": {},
    "outputs": [],
@@ -416,7 +411,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 13,
+   "execution_count": 20,
    "id": "5e6aadf0-19ad-49e2-a555-2afa3432ac67",
    "metadata": {},
    "outputs": [],
@@ -427,7 +422,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 14,
+   "execution_count": 21,
    "id": "7fca9f31-203f-4e32-8523-5265c3d1405a",
    "metadata": {},
    "outputs": [],
@@ -442,7 +437,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 15,
+   "execution_count": 22,
    "id": "c3aaf23f-97a0-4032-ab01-f17ef238ebbe",
    "metadata": {},
    "outputs": [],
@@ -461,7 +456,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 16,
+   "execution_count": 23,
    "id": "dd8abcbd-cc16-424a-8295-a1c79f55024a",
    "metadata": {},
    "outputs": [
@@ -469,9 +464,147 @@
      "name": "stderr",
      "output_type": "stream",
      "text": [
-      "25/04/21 12:38:21 WARN TaskSetManager: Stage 1 contains a task of very large size (69323 KiB). The maximum recommended task size is 1000 KiB.\n",
-      "25/04/21 12:38:29 WARN TaskSetManager: Stage 4 contains a task of very large size (57564 KiB). The maximum recommended task size is 1000 KiB.\n",
-      "                                                                                "
+      "25/04/21 19:09:04 WARN TaskSetManager: Stage 1 contains a task of very large size (69323 KiB). The maximum recommended task size is 1000 KiB.\n",
+      "25/04/21 19:09:05 ERROR Executor: Exception in task 4.0 in stage 1.0 (TID 5) 12]\n",
+      "java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "25/04/21 19:09:05 ERROR Executor: Exception in task 2.0 in stage 1.0 (TID 3)\n",
+      "java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "25/04/21 19:09:05 WARN TaskSetManager: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "25/04/21 19:09:05 ERROR TaskSetManager: Task 2 in stage 1.0 failed 1 times; aborting job\n",
+      "25/04/21 19:09:05 WARN TaskSetManager: Lost task 3.0 in stage 1.0 (TID 4) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:05 WARN TaskSetManager: Lost task 9.0 in stage 1.0 (TID 10) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:05 WARN TaskSetManager: Lost task 1.0 in stage 1.0 (TID 2) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "[Stage 1:>                                                         (0 + 7) / 12]"
+     ]
+    },
+    {
+     "ename": "Py4JJavaError",
+     "evalue": "An error occurred while calling o184.pivot.\n: org.apache.spark.SparkException: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n\nDriver stacktrace:\n\tat org.apache.spark.scheduler.DAGScheduler.failJobAndIndependentStages(DAGScheduler.scala:2856)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:2792)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:2791)\n\tat scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)\n\tat scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)\n\tat scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)\n\tat org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:2791)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1247)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1247)\n\tat scala.Option.foreach(Option.scala:407)\n\tat org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1247)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3060)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2994)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2983)\n\tat org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:49)\nCaused by: java.net.SocketException: No buffer space available (Write failed)\n\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mPy4JJavaError\u001b[0m                             Traceback (most recent call last)",
+      "Cell \u001b[0;32mIn[23], line 4\u001b[0m\n\u001b[1;32m      1\u001b[0m \u001b[38;5;28;01mfrom\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21;01mpyspark\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01msql\u001b[39;00m\u001b[38;5;21;01m.\u001b[39;00m\u001b[38;5;21;01mfunctions\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;28;01mimport\u001b[39;00m first\n\u001b[1;32m      3\u001b[0m \u001b[38;5;66;03m# Pivot band-level features\u001b[39;00m\n\u001b[0;32m----> 4\u001b[0m band_pivot \u001b[38;5;241m=\u001b[39m \u001b[43mband_df\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mgroupBy\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mSubjectID\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mEpochID\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mlabel\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mpivot\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[38;5;124;43mpivot\u001b[39;49m\u001b[38;5;124;43m\"\u001b[39;49m\u001b[43m)\u001b[49m\u001b[38;5;241m.\u001b[39magg(first(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mFeatureValue\u001b[39m\u001b[38;5;124m\"\u001b[39m))\n\u001b[1;32m      6\u001b[0m \u001b[38;5;66;03m# Pivot channel-level features\u001b[39;00m\n\u001b[1;32m      7\u001b[0m channel_pivot \u001b[38;5;241m=\u001b[39m channel_df\u001b[38;5;241m.\u001b[39mgroupBy(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mSubjectID\u001b[39m\u001b[38;5;124m\"\u001b[39m, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mEpochID\u001b[39m\u001b[38;5;124m\"\u001b[39m, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mlabel\u001b[39m\u001b[38;5;124m\"\u001b[39m)\u001b[38;5;241m.\u001b[39mpivot(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mpivot\u001b[39m\u001b[38;5;124m\"\u001b[39m)\u001b[38;5;241m.\u001b[39magg(first(\u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mFeatureValue\u001b[39m\u001b[38;5;124m\"\u001b[39m))\n",
+      "File \u001b[0;32m~/neuro-venv/lib/python3.9/site-packages/pyspark/sql/group.py:521\u001b[0m, in \u001b[0;36mGroupedData.pivot\u001b[0;34m(self, pivot_col, values)\u001b[0m\n\u001b[1;32m    435\u001b[0m \u001b[38;5;250m\u001b[39m\u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[1;32m    436\u001b[0m \u001b[38;5;124;03mPivots a column of the current :class:`DataFrame` and perform the specified aggregation.\u001b[39;00m\n\u001b[1;32m    437\u001b[0m \u001b[38;5;124;03mThere are two versions of the pivot function: one that requires the caller\u001b[39;00m\n\u001b[0;32m   (...)\u001b[0m\n\u001b[1;32m    518\u001b[0m \u001b[38;5;124;03m+----+-----+------+\u001b[39;00m\n\u001b[1;32m    519\u001b[0m \u001b[38;5;124;03m\"\"\"\u001b[39;00m\n\u001b[1;32m    520\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m values \u001b[38;5;129;01mis\u001b[39;00m \u001b[38;5;28;01mNone\u001b[39;00m:\n\u001b[0;32m--> 521\u001b[0m     jgd \u001b[38;5;241m=\u001b[39m \u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43m_jgd\u001b[49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mpivot\u001b[49m\u001b[43m(\u001b[49m\u001b[43mpivot_col\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    522\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[1;32m    523\u001b[0m     jgd \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39m_jgd\u001b[38;5;241m.\u001b[39mpivot(pivot_col, values)\n",
+      "File \u001b[0;32m~/neuro-venv/lib/python3.9/site-packages/py4j/java_gateway.py:1322\u001b[0m, in \u001b[0;36mJavaMember.__call__\u001b[0;34m(self, *args)\u001b[0m\n\u001b[1;32m   1316\u001b[0m command \u001b[38;5;241m=\u001b[39m proto\u001b[38;5;241m.\u001b[39mCALL_COMMAND_NAME \u001b[38;5;241m+\u001b[39m\\\n\u001b[1;32m   1317\u001b[0m     \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mcommand_header \u001b[38;5;241m+\u001b[39m\\\n\u001b[1;32m   1318\u001b[0m     args_command \u001b[38;5;241m+\u001b[39m\\\n\u001b[1;32m   1319\u001b[0m     proto\u001b[38;5;241m.\u001b[39mEND_COMMAND_PART\n\u001b[1;32m   1321\u001b[0m answer \u001b[38;5;241m=\u001b[39m \u001b[38;5;28mself\u001b[39m\u001b[38;5;241m.\u001b[39mgateway_client\u001b[38;5;241m.\u001b[39msend_command(command)\n\u001b[0;32m-> 1322\u001b[0m return_value \u001b[38;5;241m=\u001b[39m \u001b[43mget_return_value\u001b[49m\u001b[43m(\u001b[49m\n\u001b[1;32m   1323\u001b[0m \u001b[43m    \u001b[49m\u001b[43manswer\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mgateway_client\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mtarget_id\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;28;43mself\u001b[39;49m\u001b[38;5;241;43m.\u001b[39;49m\u001b[43mname\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m   1325\u001b[0m \u001b[38;5;28;01mfor\u001b[39;00m temp_arg \u001b[38;5;129;01min\u001b[39;00m temp_args:\n\u001b[1;32m   1326\u001b[0m     \u001b[38;5;28;01mif\u001b[39;00m \u001b[38;5;28mhasattr\u001b[39m(temp_arg, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m_detach\u001b[39m\u001b[38;5;124m\"\u001b[39m):\n",
+      "File \u001b[0;32m~/neuro-venv/lib/python3.9/site-packages/pyspark/errors/exceptions/captured.py:179\u001b[0m, in \u001b[0;36mcapture_sql_exception.<locals>.deco\u001b[0;34m(*a, **kw)\u001b[0m\n\u001b[1;32m    177\u001b[0m \u001b[38;5;28;01mdef\u001b[39;00m\u001b[38;5;250m \u001b[39m\u001b[38;5;21mdeco\u001b[39m(\u001b[38;5;241m*\u001b[39ma: Any, \u001b[38;5;241m*\u001b[39m\u001b[38;5;241m*\u001b[39mkw: Any) \u001b[38;5;241m-\u001b[39m\u001b[38;5;241m>\u001b[39m Any:\n\u001b[1;32m    178\u001b[0m     \u001b[38;5;28;01mtry\u001b[39;00m:\n\u001b[0;32m--> 179\u001b[0m         \u001b[38;5;28;01mreturn\u001b[39;00m \u001b[43mf\u001b[49m\u001b[43m(\u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43ma\u001b[49m\u001b[43m,\u001b[49m\u001b[43m \u001b[49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[38;5;241;43m*\u001b[39;49m\u001b[43mkw\u001b[49m\u001b[43m)\u001b[49m\n\u001b[1;32m    180\u001b[0m     \u001b[38;5;28;01mexcept\u001b[39;00m Py4JJavaError \u001b[38;5;28;01mas\u001b[39;00m e:\n\u001b[1;32m    181\u001b[0m         converted \u001b[38;5;241m=\u001b[39m convert_exception(e\u001b[38;5;241m.\u001b[39mjava_exception)\n",
+      "File \u001b[0;32m~/neuro-venv/lib/python3.9/site-packages/py4j/protocol.py:326\u001b[0m, in \u001b[0;36mget_return_value\u001b[0;34m(answer, gateway_client, target_id, name)\u001b[0m\n\u001b[1;32m    324\u001b[0m value \u001b[38;5;241m=\u001b[39m OUTPUT_CONVERTER[\u001b[38;5;28mtype\u001b[39m](answer[\u001b[38;5;241m2\u001b[39m:], gateway_client)\n\u001b[1;32m    325\u001b[0m \u001b[38;5;28;01mif\u001b[39;00m answer[\u001b[38;5;241m1\u001b[39m] \u001b[38;5;241m==\u001b[39m REFERENCE_TYPE:\n\u001b[0;32m--> 326\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m Py4JJavaError(\n\u001b[1;32m    327\u001b[0m         \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mAn error occurred while calling \u001b[39m\u001b[38;5;132;01m{0}\u001b[39;00m\u001b[38;5;132;01m{1}\u001b[39;00m\u001b[38;5;132;01m{2}\u001b[39;00m\u001b[38;5;124m.\u001b[39m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39m\n\u001b[1;32m    328\u001b[0m         \u001b[38;5;28mformat\u001b[39m(target_id, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m.\u001b[39m\u001b[38;5;124m\"\u001b[39m, name), value)\n\u001b[1;32m    329\u001b[0m \u001b[38;5;28;01melse\u001b[39;00m:\n\u001b[1;32m    330\u001b[0m     \u001b[38;5;28;01mraise\u001b[39;00m Py4JError(\n\u001b[1;32m    331\u001b[0m         \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124mAn error occurred while calling \u001b[39m\u001b[38;5;132;01m{0}\u001b[39;00m\u001b[38;5;132;01m{1}\u001b[39;00m\u001b[38;5;132;01m{2}\u001b[39;00m\u001b[38;5;124m. Trace:\u001b[39m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;132;01m{3}\u001b[39;00m\u001b[38;5;130;01m\\n\u001b[39;00m\u001b[38;5;124m\"\u001b[39m\u001b[38;5;241m.\u001b[39m\n\u001b[1;32m    332\u001b[0m         \u001b[38;5;28mformat\u001b[39m(target_id, \u001b[38;5;124m\"\u001b[39m\u001b[38;5;124m.\u001b[39m\u001b[38;5;124m\"\u001b[39m, name, value))\n",
+      "\u001b[0;31mPy4JJavaError\u001b[0m: An error occurred while calling o184.pivot.\n: org.apache.spark.SparkException: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n\nDriver stacktrace:\n\tat org.apache.spark.scheduler.DAGScheduler.failJobAndIndependentStages(DAGScheduler.scala:2856)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2(DAGScheduler.scala:2792)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$abortStage$2$adapted(DAGScheduler.scala:2791)\n\tat scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)\n\tat scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)\n\tat scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)\n\tat org.apache.spark.scheduler.DAGScheduler.abortStage(DAGScheduler.scala:2791)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1(DAGScheduler.scala:1247)\n\tat org.apache.spark.scheduler.DAGScheduler.$anonfun$handleTaskSetFailed$1$adapted(DAGScheduler.scala:1247)\n\tat scala.Option.foreach(Option.scala:407)\n\tat org.apache.spark.scheduler.DAGScheduler.handleTaskSetFailed(DAGScheduler.scala:1247)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive(DAGScheduler.scala:3060)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2994)\n\tat org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.onReceive(DAGScheduler.scala:2983)\n\tat org.apache.spark.util.EventLoop$$anon$1.run(EventLoop.scala:49)\nCaused by: java.net.SocketException: No buffer space available (Write failed)\n\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n"
      ]
     }
    ],
@@ -490,30 +623,12 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 17,
+   "execution_count": null,
    "id": "275f872d-d29a-4eb7-a7e5-f23e6fea5410",
    "metadata": {
     "scrolled": true
    },
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "25/04/21 12:38:47 WARN SparkStringUtils: Truncated the string representation of a plan since it was too large. This behavior can be adjusted by setting 'spark.sql.debug.maxToStringFields'.\n"
-     ]
-    },
-    {
-     "data": {
-      "text/plain": [
-       "DataFrame[SubjectID: string, EpochID: string, label: int, C3_Alpha_Power: double, C3_Beta_Power: double, C3_Delta_Power: double, C3_Theta_Power: double, C3_custom1_Power: double, C4_Alpha_Power: double, C4_Beta_Power: double, C4_Delta_Power: double, C4_Theta_Power: double, C4_custom1_Power: double, Cz_Alpha_Power: double, Cz_Beta_Power: double, Cz_Delta_Power: double, Cz_Theta_Power: double, Cz_custom1_Power: double, F3_Alpha_Power: double, F3_Beta_Power: double, F3_Delta_Power: double, F3_Theta_Power: double, F3_custom1_Power: double, F4_Alpha_Power: double, F4_Beta_Power: double, F4_Delta_Power: double, F4_Theta_Power: double, F4_custom1_Power: double, F7_Alpha_Power: double, F7_Beta_Power: double, F7_Delta_Power: double, F7_Theta_Power: double, F7_custom1_Power: double, F8_Alpha_Power: double, F8_Beta_Power: double, F8_Delta_Power: double, F8_Theta_Power: double, F8_custom1_Power: double, Fp1_Alpha_Power: double, Fp1_Beta_Power: double, Fp1_Delta_Power: double, Fp1_Theta_Power: double, Fp1_custom1_Power: double, Fp2_Alpha_Power: double, Fp2_Beta_Power: double, Fp2_Delta_Power: double, Fp2_Theta_Power: double, Fp2_custom1_Power: double, Fz_Alpha_Power: double, Fz_Beta_Power: double, Fz_Delta_Power: double, Fz_Theta_Power: double, Fz_custom1_Power: double, O1_Alpha_Power: double, O1_Beta_Power: double, O1_Delta_Power: double, O1_Theta_Power: double, O1_custom1_Power: double, O2_Alpha_Power: double, O2_Beta_Power: double, O2_Delta_Power: double, O2_Theta_Power: double, O2_custom1_Power: double, P3_Alpha_Power: double, P3_Beta_Power: double, P3_Delta_Power: double, P3_Theta_Power: double, P3_custom1_Power: double, P4_Alpha_Power: double, P4_Beta_Power: double, P4_Delta_Power: double, P4_Theta_Power: double, P4_custom1_Power: double, Pz_Alpha_Power: double, Pz_Beta_Power: double, Pz_Delta_Power: double, Pz_Theta_Power: double, Pz_custom1_Power: double, T3_Alpha_Power: double, T3_Beta_Power: double, T3_Delta_Power: double, T3_Theta_Power: double, T3_custom1_Power: double, T4_Alpha_Power: double, T4_Beta_Power: double, T4_Delta_Power: double, T4_Theta_Power: double, T4_custom1_Power: double, T5_Alpha_Power: double, T5_Beta_Power: double, T5_Delta_Power: double, T5_Theta_Power: double, T5_custom1_Power: double, T6_Alpha_Power: double, T6_Beta_Power: double, T6_Delta_Power: double, T6_Theta_Power: double, T6_custom1_Power: double, C3_TotalEnergy: double, C3_TotalPower: double, C4_TotalEnergy: double, C4_TotalPower: double, Cz_TotalEnergy: double, Cz_TotalPower: double, F3_TotalEnergy: double, F3_TotalPower: double, F4_TotalEnergy: double, F4_TotalPower: double, F7_TotalEnergy: double, F7_TotalPower: double, F8_TotalEnergy: double, F8_TotalPower: double, Fp1_TotalEnergy: double, Fp1_TotalPower: double, Fp2_TotalEnergy: double, Fp2_TotalPower: double, Fz_TotalEnergy: double, Fz_TotalPower: double, O1_TotalEnergy: double, O1_TotalPower: double, O2_TotalEnergy: double, O2_TotalPower: double, P3_TotalEnergy: double, P3_TotalPower: double, P4_TotalEnergy: double, P4_TotalPower: double, Pz_TotalEnergy: double, Pz_TotalPower: double, T3_TotalEnergy: double, T3_TotalPower: double, T4_TotalEnergy: double, T4_TotalPower: double, T5_TotalEnergy: double, T5_TotalPower: double, T6_TotalEnergy: double, T6_TotalPower: double, AppEntropy: double, HiguchiFD: double, HjorthComplexity: double, HjorthMobility: double, KatzFD: double, Kurtosis: double, Mean: double, RMS: double, SampleEntropy: double, Skewness: double, Std: double, Variance: double]"
-      ]
-     },
-     "execution_count": 17,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "from functools import reduce\n",
     "\n",
@@ -532,85 +647,40 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 18,
+   "execution_count": null,
    "id": "422071cf-6163-4f61-88e7-6c404bfebde9",
    "metadata": {},
-   "outputs": [
-    {
-     "data": {
-      "text/plain": [
-       "pyspark.sql.dataframe.DataFrame"
-      ]
-     },
-     "execution_count": 18,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "type(full_df)"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 19,
+   "execution_count": null,
    "id": "6319937e-4a56-41b7-8cb2-857fa815db06",
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "25/04/21 12:38:47 WARN CacheManager: Asked to cache already cached data.\n"
-     ]
-    },
-    {
-     "data": {
-      "text/plain": [
-       "DataFrame[SubjectID: string, EpochID: string, label: int, C3_Alpha_Power: double, C3_Beta_Power: double, C3_Delta_Power: double, C3_Theta_Power: double, C3_custom1_Power: double, C4_Alpha_Power: double, C4_Beta_Power: double, C4_Delta_Power: double, C4_Theta_Power: double, C4_custom1_Power: double, Cz_Alpha_Power: double, Cz_Beta_Power: double, Cz_Delta_Power: double, Cz_Theta_Power: double, Cz_custom1_Power: double, F3_Alpha_Power: double, F3_Beta_Power: double, F3_Delta_Power: double, F3_Theta_Power: double, F3_custom1_Power: double, F4_Alpha_Power: double, F4_Beta_Power: double, F4_Delta_Power: double, F4_Theta_Power: double, F4_custom1_Power: double, F7_Alpha_Power: double, F7_Beta_Power: double, F7_Delta_Power: double, F7_Theta_Power: double, F7_custom1_Power: double, F8_Alpha_Power: double, F8_Beta_Power: double, F8_Delta_Power: double, F8_Theta_Power: double, F8_custom1_Power: double, Fp1_Alpha_Power: double, Fp1_Beta_Power: double, Fp1_Delta_Power: double, Fp1_Theta_Power: double, Fp1_custom1_Power: double, Fp2_Alpha_Power: double, Fp2_Beta_Power: double, Fp2_Delta_Power: double, Fp2_Theta_Power: double, Fp2_custom1_Power: double, Fz_Alpha_Power: double, Fz_Beta_Power: double, Fz_Delta_Power: double, Fz_Theta_Power: double, Fz_custom1_Power: double, O1_Alpha_Power: double, O1_Beta_Power: double, O1_Delta_Power: double, O1_Theta_Power: double, O1_custom1_Power: double, O2_Alpha_Power: double, O2_Beta_Power: double, O2_Delta_Power: double, O2_Theta_Power: double, O2_custom1_Power: double, P3_Alpha_Power: double, P3_Beta_Power: double, P3_Delta_Power: double, P3_Theta_Power: double, P3_custom1_Power: double, P4_Alpha_Power: double, P4_Beta_Power: double, P4_Delta_Power: double, P4_Theta_Power: double, P4_custom1_Power: double, Pz_Alpha_Power: double, Pz_Beta_Power: double, Pz_Delta_Power: double, Pz_Theta_Power: double, Pz_custom1_Power: double, T3_Alpha_Power: double, T3_Beta_Power: double, T3_Delta_Power: double, T3_Theta_Power: double, T3_custom1_Power: double, T4_Alpha_Power: double, T4_Beta_Power: double, T4_Delta_Power: double, T4_Theta_Power: double, T4_custom1_Power: double, T5_Alpha_Power: double, T5_Beta_Power: double, T5_Delta_Power: double, T5_Theta_Power: double, T5_custom1_Power: double, T6_Alpha_Power: double, T6_Beta_Power: double, T6_Delta_Power: double, T6_Theta_Power: double, T6_custom1_Power: double, C3_TotalEnergy: double, C3_TotalPower: double, C4_TotalEnergy: double, C4_TotalPower: double, Cz_TotalEnergy: double, Cz_TotalPower: double, F3_TotalEnergy: double, F3_TotalPower: double, F4_TotalEnergy: double, F4_TotalPower: double, F7_TotalEnergy: double, F7_TotalPower: double, F8_TotalEnergy: double, F8_TotalPower: double, Fp1_TotalEnergy: double, Fp1_TotalPower: double, Fp2_TotalEnergy: double, Fp2_TotalPower: double, Fz_TotalEnergy: double, Fz_TotalPower: double, O1_TotalEnergy: double, O1_TotalPower: double, O2_TotalEnergy: double, O2_TotalPower: double, P3_TotalEnergy: double, P3_TotalPower: double, P4_TotalEnergy: double, P4_TotalPower: double, Pz_TotalEnergy: double, Pz_TotalPower: double, T3_TotalEnergy: double, T3_TotalPower: double, T4_TotalEnergy: double, T4_TotalPower: double, T5_TotalEnergy: double, T5_TotalPower: double, T6_TotalEnergy: double, T6_TotalPower: double, AppEntropy: double, HiguchiFD: double, HjorthComplexity: double, HjorthMobility: double, KatzFD: double, Kurtosis: double, Mean: double, RMS: double, SampleEntropy: double, Skewness: double, Std: double, Variance: double]"
-      ]
-     },
-     "execution_count": 19,
-     "metadata": {},
-     "output_type": "execute_result"
-    }
-   ],
+   "outputs": [],
    "source": [
     "full_df.repartition(16).persist()\n"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 31,
+   "execution_count": null,
    "id": "a256491e-71f9-4cef-b355-e70695bcfc7e",
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "w\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "print(\"w\")"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 32,
+   "execution_count": null,
    "id": "04c82a06-4033-4d06-92fa-49cc818ed937",
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stderr",
-     "output_type": "stream",
-     "text": [
-      "                                                                                "
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "NUM_TEST_SUBJECTS_PER_GROUP = 2\n",
     "\n",
@@ -640,25 +710,17 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 33,
+   "execution_count": null,
    "id": "e1b59677-547d-4580-b317-31c74af7176b",
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "w\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "print(\"w\")"
    ]
   },
   {
    "cell_type": "code",
-   "execution_count": 34,
+   "execution_count": null,
    "id": "7b61a068-fbef-4b01-996a-edc306fc47e6",
    "metadata": {},
    "outputs": [],
@@ -696,19 +758,10 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 35,
+   "execution_count": null,
    "id": "cbda20ff-c236-4572-831b-758a89a782c1",
    "metadata": {},
-   "outputs": [
-    {
-     "name": "stdout",
-     "output_type": "stream",
-     "text": [
-      "alz_test_subjects ['sub-001', 'sub-002']\n",
-      "cntrl_test_subjects ['sub-037', 'sub-038']\n"
-     ]
-    }
-   ],
+   "outputs": [],
    "source": [
     "print(f\"alz_test_subjects {alz_test_subjects}\")\n",
     "print(f\"cntrl_test_subjects {cntrl_test_subjects}\")"
@@ -716,7 +769,7 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 36,
+   "execution_count": null,
    "id": "a44a1cfb-e6b3-4de0-bace-a438bc2d8a18",
    "metadata": {},
    "outputs": [],
@@ -728,15 +781,168 @@
   },
   {
    "cell_type": "code",
-   "execution_count": 37,
+   "execution_count": null,
    "id": "b2ee5095-8c33-4aa9-ad50-5760658f7f45",
    "metadata": {},
    "outputs": [
     {
-     "name": "stdout",
+     "name": "stderr",
      "output_type": "stream",
      "text": [
-      "got here\n"
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 7.0 in stage 1 (TID 8): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 5.0 in stage 1 (TID 6): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 7.0 in stage 1.0 (TID 8) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 5.0 in stage 1.0 (TID 6) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 11.0 in stage 1 (TID 12): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 11.0 in stage 1.0 (TID 12) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 0.0 in stage 1 (TID 1): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 0.0 in stage 1.0 (TID 1) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 10.0 in stage 1 (TID 11): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 10.0 in stage 1.0 (TID 11) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 6.0 in stage 1 (TID 7): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 6.0 in stage 1.0 (TID 7) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n",
+      "25/04/21 19:09:08 WARN PythonRunner: Detected deadlock while completing task 8.0 in stage 1 (TID 9): Attempting to kill Python Worker\n",
+      "25/04/21 19:09:08 WARN TaskSetManager: Lost task 8.0 in stage 1.0 (TID 9) (192.168.1.172 executor driver): TaskKilled (Stage cancelled: Job aborted due to stage failure: Task 2 in stage 1.0 failed 1 times, most recent failure: Lost task 2.0 in stage 1.0 (TID 3) (192.168.1.172 executor driver): java.net.SocketException: No buffer space available (Write failed)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite0(Native Method)\n",
+      "\tat java.base/java.net.SocketOutputStream.socketWrite(SocketOutputStream.java:110)\n",
+      "\tat java.base/java.net.SocketOutputStream.write(SocketOutputStream.java:150)\n",
+      "\tat java.base/java.io.BufferedOutputStream.flushBuffer(BufferedOutputStream.java:81)\n",
+      "\tat java.base/java.io.BufferedOutputStream.write(BufferedOutputStream.java:127)\n",
+      "\tat java.base/java.io.DataOutputStream.write(DataOutputStream.java:107)\n",
+      "\tat java.base/java.io.FilterOutputStream.write(FilterOutputStream.java:108)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.write$1(PythonRDD.scala:310)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.$anonfun$writeIteratorToStream$1$adapted(PythonRDD.scala:322)\n",
+      "\tat scala.collection.Iterator.foreach(Iterator.scala:943)\n",
+      "\tat scala.collection.Iterator.foreach$(Iterator.scala:943)\n",
+      "\tat org.apache.spark.InterruptibleIterator.foreach(InterruptibleIterator.scala:28)\n",
+      "\tat org.apache.spark.api.python.PythonRDD$.writeIteratorToStream(PythonRDD.scala:322)\n",
+      "\tat org.apache.spark.api.python.PythonRunner$$anon$2.writeIteratorToStream(PythonRunner.scala:751)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.$anonfun$run$1(PythonRunner.scala:451)\n",
+      "\tat org.apache.spark.util.Utils$.logUncaughtExceptions(Utils.scala:1928)\n",
+      "\tat org.apache.spark.api.python.BasePythonRunner$WriterThread.run(PythonRunner.scala:282)\n",
+      "\n",
+      "Driver stacktrace:)\n"
      ]
     }
    ],
@@ -749,7 +955,7 @@
    "id": "f01d6a7e-a344-456f-a451-29adb85d56bd",
    "metadata": {},
    "source": [
-    "# NEED TO MIN MAX AFTER PCA!, should do something line z-score , pca , then min max (optional)"
+    "# DO T-TEST HERE !!"
    ]
   },
   {
