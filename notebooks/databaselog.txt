@@ -1,3 +1,4 @@
+### ERROR IN DATABASE CREATION SYSTEM, BETWEEN TWO STATEMENTS (all the april 19 2141) ARE EQUAL TO DERIVATIVES = FALSE  ###
 === DATABASE LOG ENTRY: Apr19_2141 ===
 Saved file: features_alz_extra_features_Apr19_2141.pkl
 Unique subjects: -1
@@ -32,6 +33,8 @@ Configuration:
   stepSize: 0.3
   windowLength: 3
 
+
+### ERROR IN DATABASE CREATION SYSTEM, ONES ABOVE HAVE DERIVATIVES = FALSE ###
 === DATABASE LOG ENTRY: Apr20_1604 ===
 Saved file: features_alz_extra_features_Apr20_1604.pkl
 Unique subjects: -1
