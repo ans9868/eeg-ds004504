@@ -164,10 +164,11 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
 
 
 '''
-Process's a specific subject 
+Process's a specific subject , move this to populate schemas ? 
 '''
 def processSubject(subject, n_jobs=-1, freqBands=freqBands):
     start = time.time()    
+
 
     epochs = processSub(subject)
     epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method=method) for x in range(len(epochs)))
@@ -175,6 +176,8 @@ def processSubject(subject, n_jobs=-1, freqBands=freqBands):
    
     print(f"processSubject {subject}:", time.time()-start)
     return epochResults
+
+
 
 '''
 Put in a list of subjects, and it will process them in a dataframe with numpy arrays for data
