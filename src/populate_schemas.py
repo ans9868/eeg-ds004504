@@ -69,35 +69,87 @@ def load_subjects_df(spark: SparkSession, participants_path: str="") -> DataFram
     return spark.createDataFrame(records, schema=get_subject_schema())
 
 
+
+
+
+
+
+from joblib import Parallel, delayed
+
 @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
 def extract_features_udtf(pdf):
     from feature_extraction import processEpoch, processSub
-    from pyspark.sql import Row
-    rows = []
-    # derivatives = config['derivatives']
+    import time
+
+    all_rows = []
 
     for _, row in pdf.iterrows():
         subject_id = row["SubjectID"]
+        print(f"[START] {subject_id}")
+        start = time.time()
+
         try:
             epochs = processSub(subject_id, config['derivatives'])
-            for i in range(len(epochs)):
-                    try:
-                        epoch = epochs[i]
-                        epoch_id = f"ep-{i}"
-                        epoch_features = processEpoch(subject_id, epoch_id, epoch)
-                        rows.extend(epoch_features)
-                    except Exception as e:
-                        print(f"Failed to process {subject_id}:ep-{i}: {e}")
-                        continue
+
+            def safe_process(i, ep):
+                try:
+                    return processEpoch(subject_id, f"ep-{i}", ep)
+                except Exception as e:
+                    print(f"[ERROR] {subject_id}:ep-{i}: {e}")
+                    return []
+
+            results = Parallel(n_jobs=2)(
+                delayed(safe_process)(i, ep) for i, ep in enumerate(epochs)
+            )
+
+            subject_rows = []
+            for res in results:
+                if isinstance(res, list):
+                    subject_rows.extend(res)
+                else:
+                    subject_rows.append(res)
+
+            all_rows.extend(subject_rows)
+
         except Exception as e:
-            print(f"Failed to process {subject_id}: {e}")
+            print(f"[ERROR] Failed to process {subject_id}: {e}")
             continue
-    # print("FINISHED !!!")
-    # print(f"Rows{rows[0:3]}")
-    return pd.DataFrame([r.asDict() for r in rows]) # possible bottlenesck issue # performance review, can instead use end of previous function , but this is 'safer'
 
+        print(f"[FINISHED] {subject_id} in {time.time() - start:.2f}s")
 
+    return pd.DataFrame([r.asDict() for r in all_rows])
 
+# Wed Apr 23
+
+# @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
+# def extract_features_udtf(pdf):
+#     from feature_extraction import processEpoch, processSub
+#     from pyspark.sql import Row
+#     rows = []
+#     # derivatives = config['derivatives']
+#
+#     for _, row in pdf.iterrows():
+#         subject_id = row["SubjectID"]
+#         try:
+#             epochs = processSub(subject_id, config['derivatives'])
+#             for i in range(len(epochs)):
+#                     try:
+#                         epoch = epochs[i]
+#                         epoch_id = f"ep-{i}"
+#                         epoch_features = processEpoch(subject_id, epoch_id, epoch)
+#                         rows.extend(epoch_features)
+#                     except Exception as e:
+#                         print(f"Failed to process {subject_id}:ep-{i}: {e}")
+#                         continue
+#         except Exception as e:
+#             print(f"Failed to process {subject_id}: {e}")
+#             continue
+#     # print("FINISHED !!!")
+#     # print(f"Rows{rows[0:3]}")
+#     return pd.DataFrame([r.asDict() for r in rows]) # possible bottlenesck issue # performance review, can instead use end of previous function , but this is 'safer'
+#
+
+# Oldest
 # @pandas_udf(get_feature_schema(), PandasUDFType.GROUPED_MAP)
 # def extract_features_udtf(pdf):
 #     import time
