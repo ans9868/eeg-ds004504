@@ -23,11 +23,12 @@ try:
     # When run as part of a package (local scripts, Jupyter, etc.)
     from src.config_handler import load_config, initiate_config
     from src.preprocess_sets import processSub, participantsInfoPath
+    from src.feature_extraction_helper import *
 except ImportError:
     # When run inside Spark workers (which get flat files via sc.addPyFile)
     from preprocess_sets import processSub, participantsInfoPath
     from config_handler import load_config, initiate_config
-
+    from feature_extraction_helper import *
 
 try:
     config = load_config()
@@ -81,14 +82,20 @@ def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
     ))
 
 
-# TODO : more feature extractoin per electrode per band  , be smark about what choose , and make it so that do it efficiently / no repeats 
-# At least make it so taht we expand the electrode level features, then maybe are able to do the band level features depending on time factor 
+
+method = 'welch'
+windowLength = 3
+stepSize = 1.5
+from mne.filter import filter_data
+
+from pyspark.sql import Row
 def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, windowLength=windowLength, stepSize=stepSize, n_jobs=1):
     fmin = min(band_range[0] for band_range in freqBands.values())
     fmax = max(band_range[1] for band_range in freqBands.values())
-    
+
     channelNames = epoch.info['ch_names']
-    
+
+    # PSD-based features
     psds, freqs = epoch.compute_psd(
         method=method,
         picks='eeg',
@@ -100,67 +107,101 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
     normalPsds = psds / np.sum(psds, axis=-1, keepdims=True)
     normalPsds = np.squeeze(normalPsds)
 
-    rows = []
+    # Time-domain EEG data for this epoch
     data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
-    
+
+    rows = []
+
     for channel_idx, channel_name in enumerate(channelNames):
-        for band_name, (band_fmin, band_fmax) in freqBands.items():
-            band_power = bandPower(normalPsds, freqs, band_fmin, band_fmax, channel_idx)
+        # Electrode-level features (non-band-specific)
+        electrode_features = [
+            ("TotalPower", totalBandPower(normalPsds, freqs, channel_idx)),
+            ("TotalEnergy", totalEnergy(normalPsds, freqs, channel_idx)),
+            ("SpectralEntropy", spectral_entropy_from_psd(normalPsds[channel_idx, :])),
+            ("HjorthActivity", np.var(data[channel_idx, :])),
+            ("HjorthMobility", compute_hjorth_mobility(data[channel_idx:channel_idx+1])[0]),
+            ("HjorthComplexity", compute_hjorth_complexity(data[channel_idx:channel_idx+1])[0]),
+            ("HjorthIndex", compute_hjorth_index(data[channel_idx:channel_idx+1])[0])
+        ]
+        
+        for fname, val in electrode_features:
             rows.append(Row(
                 SubjectID=subjectID,
                 EpochID=epochID,
                 Electrode=channel_name,
-                WaveBand=band_name,
-                FeatureName="Power",
-                FeatureValue=band_power,
-                table_type="band"
+                WaveBand=None,
+                FeatureName=fname,
+                FeatureValue=float(val),
+                table_type="electrode"
             ))
 
-        rows.append(Row(
-            SubjectID=subjectID,
-            EpochID=epochID,
-            Electrode=channel_name,
-            WaveBand=None,
-            FeatureName="TotalEnergy",
-            FeatureValue=totalEnergy(normalPsds, freqs, channel_idx),
-            table_type="electrode"
-        ))
 
-        rows.append(Row(
-            SubjectID=subjectID,
-            EpochID=epochID,
-            Electrode=channel_name,
-            WaveBand=None,
-            FeatureName="TotalPower",
-            FeatureValue=totalBandPower(normalPsds, freqs, channel_idx),
-            table_type="electrode"
-        ))
+        for band_name, (band_fmin, band_fmax) in freqBands.items():
+            band_mask = (freqs >= band_fmin) & (freqs < band_fmax)
+            psd_band = normalPsds[channel_idx, band_mask]
+
+            # Band Power from PSD
+            band_power = psd_band.mean()
+            spectral_entropy = spectral_entropy_from_psd(psd_band)
+
+            # Optional: Filtered band-passed time-series (replace with real filtered data if available)
+            # Here we slice based on band_mask for pseudo-time-domain view (not valid!)
+            band_signal = data[channel_idx, :]  # Ideally, you'd band-pass filter this
+
+            mobility = compute_hjorth_mobility(data[channel_idx:channel_idx+1])[0]
+            complexity = compute_hjorth_complexity(data[channel_idx:channel_idx+1])[0]
+            hjorth_index = compute_hjorth_index(data[channel_idx:channel_idx+1])[0]
+
+            # Band-level features
+            for fname, val in [
+                ("Power", band_power),
+                ("SpectralEntropy", spectral_entropy),
+                # ("HjorthActivity", activit),
+                ("HjorthMobility", mobility),
+                ("HjorthComplexity", complexity),
+                ("HjorthIndex", hjorth_index)
+            ]:
+                rows.append(Row(
+                    SubjectID=subjectID,
+                    EpochID=epochID,
+                    Electrode=channel_name,
+                    WaveBand=band_name,
+                    FeatureName=fname,
+                    FeatureValue=float(val),
+                    table_type="band"
+                ))    
 
 
-
-
-    # ----- Epoch-level features via mne-features -----
-    data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
-
-    # univariate features - averaged aross channels
-    add_epoch_feature(rows, subjectID, epochID, "Mean", np.mean(compute_mean(data)))
-    add_epoch_feature(rows, subjectID, epochID, "Std", np.mean(compute_std(data)))
-    add_epoch_feature(rows, subjectID, epochID, "Variance", np.mean(compute_std(data) ** 2))
-    add_epoch_feature(rows, subjectID, epochID, "Skewness", np.mean(compute_skewness(data)))
-    add_epoch_feature(rows, subjectID, epochID, "Kurtosis", np.mean(compute_kurtosis(data)))
-    add_epoch_feature(rows, subjectID, epochID, "RMS", np.mean(compute_rms(data)))
+    # Epoch-level features: averaged across all channels
+    epoch_feature_list = [
+        ("Mean", np.mean(compute_mean(data))),
+        ("Std", np.mean(compute_std(data))),
+        ("Variance", np.mean(compute_variance(data))),
+        ("Skewness", np.mean(compute_skewness(data))),
+        ("Kurtosis", np.mean(compute_kurtosis(data))),
+        ("RMS", np.mean(compute_rms(data))),
+        ("HjorthMobility", np.mean(compute_hjorth_mobility(data))),
+        ("HjorthComplexity", np.mean(compute_hjorth_complexity(data))),
+        ("HjorthIndex", np.mean(compute_hjorth_index(data))),
+        ("AppEntropy", np.mean(compute_app_entropy(data))),
+        ("SampleEntropy", np.mean(compute_samp_entropy(data))),
+        ("HiguchiFD", np.mean(compute_higuchi_fd(data))),
+        ("KatzFD", np.mean(compute_katz_fd(data)))
+    ]
     
-    # Hjorth parameters
-    add_epoch_feature(rows, subjectID, epochID, "HjorthMobility", np.mean(compute_hjorth_mobility(data)))
-    add_epoch_feature(rows, subjectID, epochID, "HjorthComplexity", np.mean(compute_hjorth_complexity(data)))
-
-    # Entropy + nonlinear
-    add_epoch_feature(rows, subjectID, epochID, "AppEntropy", np.mean(compute_app_entropy(data)))
-    add_epoch_feature(rows, subjectID, epochID, "SampleEntropy", np.mean(compute_samp_entropy(data)))
-    add_epoch_feature(rows, subjectID, epochID, "HiguchiFD", np.mean(compute_higuchi_fd(data)))
-    add_epoch_feature(rows, subjectID, epochID, "KatzFD", np.mean(compute_katz_fd(data)))
-
+    for fname, val in epoch_feature_list:
+        rows.append(Row(
+            SubjectID=subjectID,
+            EpochID=epochID,
+            Electrode=None,
+            WaveBand=None,
+            FeatureName=fname,
+            FeatureValue=float(val),
+            table_type="epoch"
+        ))
+        
     return rows
+
 
 
 '''

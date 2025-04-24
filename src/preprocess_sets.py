@@ -106,14 +106,23 @@ def processSub(sub, derivatives=derivatives, windowLength=windowLength, stepSize
     print("processSub: windowLength", windowLength)
     print("processSub: windowLength", stepSize)
     raw = mne.io.read_raw_eeglab(subPath(sub, derivatives), preload=True)
+    
+    # removing the boundary events
+    
+    for i, desc in enumerate(raw.annotations.description):
+        if 'boundary' in desc:
+            raw.annotations.description[i] = 'BAD_boundary'
+
     sfreq = raw.info['sfreq']
+
 
     start_times = np.arange(0, raw.times[-1] - windowLength, stepSize)
     events = np.array([[int(t * sfreq), 0, 1] for t in start_times]) # [sample_index, previous_event_1d, current_event_id], note, 0 -> means we don't have transitions between events,
     
     epochs = mne.Epochs(
         raw, events, event_id=1, tmin=0, tmax=windowLength,
-        baseline=None, detrend=1, preload=True, verbose=False
+        baseline=None, detrend=1, preload=True, verbose=False,
+        reject_by_annotation=True
     )
     
     return epochs
