@@ -123,7 +123,7 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             ("HjorthComplexity", compute_hjorth_complexity(data[channel_idx:channel_idx+1])[0]),
             ("HjorthIndex", compute_hjorth_index(data[channel_idx:channel_idx+1])[0])
         ]
-        
+
         for fname, val in electrode_features:
             rows.append(Row(
                 SubjectID=subjectID,
@@ -135,7 +135,7 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
                 table_type="electrode"
             ))
 
-
+        
         for band_name, (band_fmin, band_fmax) in freqBands.items():
             band_mask = (freqs >= band_fmin) & (freqs < band_fmax)
             psd_band = normalPsds[channel_idx, band_mask]
@@ -177,16 +177,16 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
         ("Mean", np.mean(compute_mean(data))),
         ("Std", np.mean(compute_std(data))),
         ("Variance", np.mean(compute_variance(data))),
-        ("Skewness", np.mean(compute_skewness(data))),
-        ("Kurtosis", np.mean(compute_kurtosis(data))),
+        # ("Skewness", np.mean(compute_skewness(data))),
+        # ("Kurtosis", np.mean(compute_kurtosis(data))),
         ("RMS", np.mean(compute_rms(data))),
         ("HjorthMobility", np.mean(compute_hjorth_mobility(data))),
-        ("HjorthComplexity", np.mean(compute_hjorth_complexity(data))),
-        ("HjorthIndex", np.mean(compute_hjorth_index(data))),
-        ("AppEntropy", np.mean(compute_app_entropy(data))),
-        ("SampleEntropy", np.mean(compute_samp_entropy(data))),
-        ("HiguchiFD", np.mean(compute_higuchi_fd(data))),
-        ("KatzFD", np.mean(compute_katz_fd(data)))
+        # ("HjorthComplexity", np.mean(compute_hjorth_complexity(data))),
+        # ("HjorthIndex", np.mean(compute_hjorth_index(data))),
+        # ("AppEntropy", np.mean(compute_app_entropy(data))),
+        # ("SampleEntropy", np.mean(compute_samp_entropy(data))),
+        # ("HiguchiFD", np.mean(compute_higuchi_fd(data))),
+        # ("KatzFD", np.mean(compute_katz_fd(data)))
     ]
     
     for fname, val in epoch_feature_list:
@@ -199,7 +199,20 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             FeatureValue=float(val),
             table_type="epoch"
         ))
-        
+    
+    # * test row * 
+    # rows.append(Row(
+    #         SubjectID=subjectID,
+    #         EpochID=epochID,
+    #         Electrode=None,
+    #         WaveBand=None,
+    #         FeatureName="test",
+    #         FeatureValue=float(22.0),
+    #         table_type="epoch"
+    #     ))
+   
+
+
     return rows
 
 

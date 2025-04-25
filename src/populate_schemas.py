@@ -98,9 +98,10 @@ def extract_features_udtf(pdf):
                     print(f"[ERROR] {subject_id}:ep-{i}: {e}")
                     return []
 
-            results = Parallel(n_jobs=2)(
-                delayed(safe_process)(i, ep) for i, ep in enumerate(epochs)
-            )
+            # results = Parallel(n_jobs=2)(
+            #     delayed(safe_process)(i, epochs[i]) for i in range(len(epochs))
+            # )
+            results = [safe_process(i, epochs[i]) for i in range(len(epochs))]
 
             subject_rows = []
             for res in results:
