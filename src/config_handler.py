@@ -84,11 +84,11 @@ def _interactive_config(default_config=None):
                         fmin = float(input(f"  {name} min freq: "))
                         fmax = float(input(f"  {name} max freq: "))
                         if fmin >= fmax:
-                            print("⚠️  min must be less than max. Try again.")
+                            print("min must be less than max. Try again.")
                             continue
                         custom_bands[name] = [fmin, fmax]
                     except ValueError:
-                        print("⚠️  Please enter valid numbers for frequencies.")
+                        print("Please enter valid numbers for frequencies.")
                 config[key] = custom_bands if custom_bands else default
         # special case for welch / multitaper 
         elif key == "method":
@@ -102,7 +102,7 @@ def _interactive_config(default_config=None):
                     config["method"] = user_input
                     break
                 else:
-                    print("❗ ERROR: Method must be either 'welch' or 'multitaper'. Please try again.")
+                    print("ERROR: Method must be either 'welch' or 'multitaper'. Please try again.")
         # Everything else (derivatives, windowLength, stepSize)
         else:
             while True:
@@ -114,7 +114,7 @@ def _interactive_config(default_config=None):
                     config[key] = type(default)(user_input)
                     break
                 except ValueError:
-                    print(f"⚠️  Could not convert '{user_input}' to {type(default).__name__}. Please try again.")
+                    print(f"Could not convert '{user_input}' to {type(default).__name__}. Please try again.")
 
     return config
 
