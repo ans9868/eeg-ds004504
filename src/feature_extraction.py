@@ -44,42 +44,6 @@ stepSize = config['stepSize']
 method = config['method']
 print(f"Config using in feature Extraction.py {config}")
 
-def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
-   # Select the channel's PSD and the frequencies in the range
-    band_mask = (freqs >= fmin) & (freqs < fmax)
-    # print(f'Normal psd shape {normalPsd.shape()}')
-    #print(f'Normal psd {normalPsd}')
-    band_power = normalPsd[channel_idx, band_mask].mean()
-    
-    return band_power
-
-
-# check, this might just be all zeros after normliziatoin 
-def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mean across all frequencies to be consistent
-    total_power = normalPsd[channel_idx, :].mean()
-    
-    return total_power
-
-def totalEnergy(normalPsd, freqs, channel_idx=0):
-    '''
-    Compute the total energy of the EEG signal for a specific channel.
-    Total energy is defined as the sum of the squared amplitude over time.     
-    '''
-   
-    channel_signal = normalPsd[channel_idx, :]
-    energy = np.sum(np.square(channel_signal))
-    return energy
-
-def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
-    rows.append(Row(
-        SubjectID=subjectID,
-        EpochID=epochID,
-        Electrode=None,
-        WaveBand=None,
-        FeatureName=feature_name,
-        FeatureValue=float(value),
-        table_type="epoch"
-    ))
 
 
 
@@ -95,7 +59,7 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
 
     channelNames = epoch.info['ch_names']
 
-    # PSD-based features
+    # PSD based features
     psds, freqs = epoch.compute_psd(
         method=method,
         picks='eeg',
@@ -107,7 +71,7 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
     normalPsds = psds / np.sum(psds, axis=-1, keepdims=True)
     normalPsds = np.squeeze(normalPsds)
 
-    # Time-domain EEG data for this epoch
+    # Time domain EEG data for this epoch
     data = epoch.get_data(picks="eeg")[0]  # shape (n_channels, n_times)
 
     rows = []
@@ -144,9 +108,6 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             band_power = psd_band.mean()
             spectral_entropy = spectral_entropy_from_psd(psd_band)
 
-            # Optional: Filtered band-passed time-series (replace with real filtered data if available)
-            # Here we slice based on band_mask for pseudo-time-domain view (not valid!)
-            band_signal = data[channel_idx, :]  # Ideally, you'd band-pass filter this
 
             mobility = compute_hjorth_mobility(data[channel_idx:channel_idx+1])[0]
             complexity = compute_hjorth_complexity(data[channel_idx:channel_idx+1])[0]
@@ -177,16 +138,8 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
         ("Mean", np.mean(compute_mean(data))),
         ("Std", np.mean(compute_std(data))),
         ("Variance", np.mean(compute_variance(data))),
-        # ("Skewness", np.mean(compute_skewness(data))),
-        # ("Kurtosis", np.mean(compute_kurtosis(data))),
         ("RMS", np.mean(compute_rms(data))),
         ("HjorthMobility", np.mean(compute_hjorth_mobility(data))),
-        # ("HjorthComplexity", np.mean(compute_hjorth_complexity(data))),
-        # ("HjorthIndex", np.mean(compute_hjorth_index(data))),
-        # ("AppEntropy", np.mean(compute_app_entropy(data))),
-        # ("SampleEntropy", np.mean(compute_samp_entropy(data))),
-        # ("HiguchiFD", np.mean(compute_higuchi_fd(data))),
-        # ("KatzFD", np.mean(compute_katz_fd(data)))
     ]
     
     for fname, val in epoch_feature_list:
@@ -200,25 +153,12 @@ def processEpoch(subjectID, epochID, epoch, freqBands=freqBands, method=method, 
             table_type="epoch"
         ))
     
-    # * test row * 
-    # rows.append(Row(
-    #         SubjectID=subjectID,
-    #         EpochID=epochID,
-    #         Electrode=None,
-    #         WaveBand=None,
-    #         FeatureName="test",
-    #         FeatureValue=float(22.0),
-    #         table_type="epoch"
-    #     ))
-   
-
-
     return rows
 
 
 
 '''
-Process's a specific subject , move this to populate schemas ? 
+Process's a specific subject
 '''
 def processSubject(subject, n_jobs=-1, freqBands=freqBands):
     start = time.time()    
@@ -226,7 +166,6 @@ def processSubject(subject, n_jobs=-1, freqBands=freqBands):
 
     epochs = processSub(subject)
     epochResults = Parallel(n_jobs=n_jobs, prefer="processes")(delayed(processEpoch)(epochs[x], method=method) for x in range(len(epochs)))
-    # processedEpoch = processEpoch(epochs[0], freqBands)
    
     print(f"processSubject {subject}:", time.time()-start)
     return epochResults
@@ -245,33 +184,3 @@ def processSubjects(subjectList, n_jobs=-1):
 
     return allResults
 
-
-if __name__ == '__main__':
-    initiate_config()
-    participantsInfo = pd.read_table(participantsInfoPath())
-    A_sub = participantsInfo[participantsInfo["Group"] == "A"]["participant_id"].tolist()
-
-    NUM_SUBJECTS = 1
-    target_subjects = A_sub[:NUM_SUBJECTS]
-    print(target_subjects)
-    subject_results = processSubjects(target_subjects)  # limit to 2 for quick testing
-
-    for subject, df in subject_results.items():
-        print(f"\nSubject: {subject}")
-        print(df)
-
-
-    '''
-    participantsInfo = pd.read_table('./ds004504/participants.tsv')
-    A_sub = participantsInfo[participantsInfo["Group"] == "A"]["participant_id"].tolist()
-    C_sub = participantsInfo[participantsInfo["Group"] == "C"]["participant_id"].tolist()
-    D_sub = participantsInfo[participantsInfo["Group"] == "F"]["participant_id"].tolist()
-   
-    start = time.time()
-    epochs = processSub(A_sub[0])
-    processedEpoch = processEpoch(epochs[0], freqBands)
-    print("processSub:", time.time()-start)
-    
-    print(processedEpoch)
-    start = time.time()
-    '''

@@ -2,7 +2,48 @@
 import numpy as np
 from scipy.stats import skew, kurtosis
 
-# === Basic Stats ===
+
+
+
+def bandPower(normalPsd, freqs, fmin, fmax, channel_idx=0):
+   # Select the channel's PSD and the frequencies in the range
+    band_mask = (freqs >= fmin) & (freqs < fmax)
+    # print(f'Normal psd shape {normalPsd.shape()}')
+    #print(f'Normal psd {normalPsd}')
+    band_power = normalPsd[channel_idx, band_mask].mean()
+    
+    return band_power
+
+
+# check, this might just be all zeros after normliziatoin 
+def totalBandPower(normalPsd, freqs, channel_idx=0):    # But we compute the mean across all frequencies to be consistent
+    total_power = normalPsd[channel_idx, :].mean()
+    
+    return total_power
+
+def totalEnergy(normalPsd, freqs, channel_idx=0):
+    '''
+    Compute the total energy of the EEG signal for a specific channel.
+    Total energy is defined as the sum of the squared amplitude over time.     
+    '''
+   
+    channel_signal = normalPsd[channel_idx, :]
+    energy = np.sum(np.square(channel_signal))
+    return energy
+
+def add_epoch_feature(rows, subjectID, epochID, feature_name, value):
+    rows.append(Row(
+        SubjectID=subjectID,
+        EpochID=epochID,
+        Electrode=None,
+        WaveBand=None,
+        FeatureName=feature_name,
+        FeatureValue=float(value),
+        table_type="epoch"
+    ))
+
+
+# * Basic Stats *
 def compute_mean(x):
     return np.mean(x, axis=1)
 
@@ -15,14 +56,14 @@ def compute_variance(x):
 def compute_rms(x):
     return np.sqrt(np.mean(x**2, axis=1))
 
-# === Higher Order Moments ===
+# * Higher Order Moments *
 def compute_skewness(x):
     return np.apply_along_axis(skew, axis=1, arr=x)
 
 def compute_kurtosis(x):
     return np.apply_along_axis(kurtosis, axis=1, arr=x)
 
-# === Hjorth Parameters ===
+# * Hjorth Parameters *
 def compute_hjorth_mobility(x):
     dx = np.diff(x, axis=1)
     return np.sqrt(np.var(dx, axis=1) / np.var(x, axis=1))
@@ -39,7 +80,7 @@ def compute_hjorth_index(x):
     complexity = compute_hjorth_complexity(x)
     return 2 * complexity + 100 / (2 * mobility)
 
-# === Entropy ===
+# * Entropy *
 def compute_app_entropy(x, m=2, r=0.2):
     from numpy.linalg import norm
 
@@ -64,7 +105,7 @@ def compute_samp_entropy(x, m=2, r=0.2):
 
     return np.array([_sampen(ch, m, r * np.std(ch)) for ch in x])
 
-# === Fractal Dimensions ===
+# * Fractal Dimensions *
 def compute_higuchi_fd(x, kmax=10):
     def higuchi_fd(ts, kmax):
         N = len(ts)
@@ -94,7 +135,7 @@ def compute_katz_fd(x):
 
     return np.array([katz_fd(ch) for ch in x])
 
-# === PSD-based Features ===
+# * PSD-based Features *
 def spectral_entropy_from_psd(psd_band):
     psd_norm = psd_band / psd_band.sum()
     return -np.sum(psd_norm * np.log2(psd_norm + 1e-12))
