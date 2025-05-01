@@ -1,5 +1,5 @@
 Welcome to Our project!
-
+```text
 config.yaml
     ↓
 config_handler.py  -->  provides global settings and parameters
@@ -25,6 +25,7 @@ populate_schemas.py
 dimensionality_reduction.py
     --> optionally reduces feature dimensions using PCA
     --> returns transformed feature sets for modeling or visualization
+```
 
 
 Here is a [full report](https://drive.google.com/file/d/14tasoNzfkrh8TtQJ5RnaQljPXRAV1kAX/view?usp=sharing).
